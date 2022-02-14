@@ -1,1 +1,3 @@
 .prettierignore
+bootstrap/venv
+venv/
