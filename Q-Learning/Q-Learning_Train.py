@@ -37,7 +37,7 @@ def train(episodes=25000,
                 action = np.argmax(q_table[state])  # Exploit learned values
 
             # Apply the action and see what happens
-            next_state, reward, done, info = env.step(action)
+            next_state, reward, done, _ = env.step(action)
             total_reward[e] += reward
             steps_per_episode[e] += 1
 

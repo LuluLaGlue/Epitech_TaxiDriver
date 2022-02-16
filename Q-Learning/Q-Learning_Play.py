@@ -16,7 +16,7 @@ def play(slow=False):
 
     while not done:
         action = np.argmax(q_table[state])
-        next_state, reward, done, info = env.step(action)
+        next_state, reward, done, _ = env.step(action)
 
         result += reward
         state = next_state
