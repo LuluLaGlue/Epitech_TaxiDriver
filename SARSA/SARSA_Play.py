@@ -33,8 +33,7 @@ def play(slow=False):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Solve the Taxi Driver Game Using the Q-Learning Algorithm"
-    )
+        description="Solve the Taxi Driver  Game Using the SARSA Algorithm")
     parser.add_argument(
         "-s",
         "--slow",
