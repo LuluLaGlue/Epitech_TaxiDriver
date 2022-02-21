@@ -16,6 +16,8 @@ In order to train a model capable of completing the task at hand we decided to u
 - ***q-table.npy***: The resulting model (or Q Table) stored in a *numpy* file. It took 17 seconds to train it during *25 000* episodes.
 - ***Q-Learning_Play.py***: A python script used to play the Taxi Game based on the previously trained model (***q-table.npy**) to run it use <code>python Q-Learning_Play.py</code> with the following possible arguments:
     + <code>-s</code>: Activate Slow Mode.
+    + <code>-r</code>: Activate Render.
+    + <code>-l</code>: Set a number of times to play the game (equivalent to *episodes* during training)
     + <code>-h</code>: Display a help message.
 
 ### SARSA
@@ -31,4 +33,6 @@ In order to shorten the training time we tried to implement the SARSA algorithm.
 - ***q-table.npy***: The resulting model (or Q Table) stored in a *numpy* file. We observed that the *25 000* episodes used with ***Q Learning*** were no longer need and that the model could be trained with roughly *2 000* episodes, doing so took only 1.22s of training.
 - ***SARSA_Play.py***: A python script used to play the Taxi Game based on the previously trained model (***q-table.npy***) to run it use <code>python SARSA_Play.py</code> with the following possible arguments:
     + <code>-s</code>: Activate Slow Mode.
+    + <code>-r</code>: Activate Render.
+    + <code>-l</code>: Set a number of times to play the game (equivalent to *episodes* during training)
     + <code>-h</code>: Display a help message.
