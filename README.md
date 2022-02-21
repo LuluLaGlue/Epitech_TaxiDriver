@@ -36,3 +36,12 @@ In order to shorten the training time we tried to implement the SARSA algorithm.
     + <code>-r</code>: Activate Render.
     + <code>-l</code>: Set a number of times to play the game (equivalent to *episodes* during training)
     + <code>-h</code>: Display a help message.
+
+### DQN
+In order to train a model capable of accomplishing more complexe tasks we turned to Deep Q Learning. This attempt is located in the *DQN* directory with the following files:
+- ***DQN_Train.py***: A python script used to train and save a new model. To run it use <code>python DQN_Train.py</code> with the following possible arguments:
+    + <code>-h</code>: Display a help message.
+- ***DQN.py***: A python Class that contains our DQN model.
+- ***models/***: This folder contains a few models trained using the ***DQN_Train.py*** with varying parameters.
+- ***DQN_Play.py***: A python script used to play the Taxi Game based on a previously trained model (***models/***). To run it, use <code>python DQN_Play.py</code> with the following possible arguments:
+    + <code>-h</code>: Display a help message.
