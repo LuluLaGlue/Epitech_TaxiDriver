@@ -1,13 +1,13 @@
 import gym
 import math
-import random
 import time
+import random
+import matplotlib
 import numpy as np
 from DQN import DQN
-import matplotlib
+from itertools import count
 import matplotlib.pyplot as plt
 from collections import namedtuple, deque
-from itertools import count
 
 import torch
 import torch.nn as nn

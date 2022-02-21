@@ -7,7 +7,7 @@ from IPython import display
 import torch.optim as optim
 
 
-def get_action_for_state(state):
+def get_action_for_state(state, model):
     with torch.no_grad():
         # t.max(1) will return largest column value of each row.
         # second column on max result is index of where max element was
@@ -17,7 +17,11 @@ def get_action_for_state(state):
     return action.item()
 
 
-def play(verbose: bool = False, sleep: float = 0.2, max_steps: int = 100):
+def play(model,
+         env=gym.make("Taxi-v3").env,
+         verbose: bool = False,
+         sleep: float = 0.2,
+         max_steps: int = 100):
     # Play an episode
     actions_str = ["South", "North", "East", "West", "Pickup", "Dropoff"]
 
@@ -30,7 +34,7 @@ def play(verbose: bool = False, sleep: float = 0.2, max_steps: int = 100):
     done = False
 
     while not done:
-        action = get_action_for_state(state)
+        action = get_action_for_state(state, model)
         iteration += 1
         state, reward, done, info = env.step(action)
         display.clear_output(wait=True)
@@ -47,7 +51,7 @@ def play(verbose: bool = False, sleep: float = 0.2, max_steps: int = 100):
 
 if __name__ == "__main__":
     PATH = "./models/DQN_1645447309_almost_converge.pt"
-    device = torch.device("cpu")
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     env = gym.make("Taxi-v3").env
 
     n_actions = env.action_space.n
@@ -59,4 +63,4 @@ if __name__ == "__main__":
     model.load_state_dict(checkpoint['model_state_dict'])
     optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
 
-    play(sleep=0.1, max_steps=20)
+    play(model, env=env, sleep=0.1, max_steps=20)
