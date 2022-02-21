@@ -1,3 +1,4 @@
 .prettierignore
 bootstrap/venv
 venv/
+__pycache__/
