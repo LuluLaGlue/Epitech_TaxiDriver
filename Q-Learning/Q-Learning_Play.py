@@ -68,7 +68,8 @@ if __name__ == "__main__":
         mean_steps += steps
         mean_result += result
 
-    print(
-        "[{} LOOP DONE] - Mean Steps Per Loop: {} - Mean Reward Per Loop: {}".
-        format(args.loop, np.round(mean_steps / args.loop, 2),
-               np.round(mean_result / args.loop, 2)))
+    if args.loop > 1:
+        print(
+            "[{} LOOP DONE] - Mean Steps Per Loop: {} - Mean Reward Per Loop: {}"
+            .format(args.loop, np.round(mean_steps / args.loop, 2),
+                    np.round(mean_result / args.loop, 2)))
