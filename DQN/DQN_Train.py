@@ -1,7 +1,6 @@
 import os
 import gym
 import time
-import random
 import argparse
 import numpy as np
 import pandas as pd
@@ -38,20 +37,20 @@ class TrainingAgent():
                  memory_size=50000,
                  num_episodes=10000):
         self.config = {
-            "batch_size": batch_size,
-            "gamma": gamma,
-            "eps_start": eps_start,
-            "eps_end": eps_end,
-            "eps_decay": eps_decay,
-            "target_update": target_update,
-            "max_steps_per_episode": max_steps_per_episode,
-            "warmup_episode": warmup_episode,
-            "save_freq": save_freq,
-            "lr": lr,
-            "lr_min": lr_min,
-            "lr_decay": lr_decay,
-            "memory_size": memory_size,
-            "num_episodes": num_episodes
+            "BATCH_SIZE": batch_size,
+            "GAMMA": gamma,
+            "EPS_START": eps_start,
+            "EPS_END": eps_end,
+            "EPS_DECAY": eps_decay,
+            "TARGET_UPDATE": target_update,
+            "MAX_STEPS_PER_EPISODE": max_steps_per_episode,
+            "WARMUP_EPISODE": warmup_episode,
+            "SAVE_FREQ": save_freq,
+            "LR": lr,
+            "LR_MIN": lr_min,
+            "LR_DECAY": lr_decay,
+            "MEMORY_SIZE": memory_size,
+            "NUM_EPISODES": num_episodes
         }
         self.rng = np.random.default_rng(42)
         self.device = torch.device(
@@ -68,12 +67,12 @@ class TrainingAgent():
         self.target_model.load_state_dict(self.model.state_dict())
         self.target_model.eval()
         self.optimizer = optim.Adam(self.model.parameters(),
-                                    lr=self.config["lr"])
+                                    lr=self.config["LR"])
 
     def _get_epsilon(self, episode):
-        epsilon = self.config["eps_end"] + \
-                          (self.config["eps_start"] - self.config["eps_end"]) * \
-                              np.exp(-episode / self.config["eps_decay"])
+        epsilon = self.config["EPS_END"] + \
+                          (self.config["EPS_START"] - self.config["EPS_END"]) * \
+                              np.exp(-episode / self.config["EPS_DECAY"])
         return epsilon
 
     def _get_action_for_state(self, state):
@@ -101,9 +100,9 @@ class TrainingAgent():
             torch.tensor([done], device=self.device, dtype=torch.bool))
 
     def _train_model(self):
-        if len(self.memory) < self.config["batch_size"]:
+        if len(self.memory) < self.config["BATCH_SIZE"]:
             return
-        transitions = self.memory.sample(self.config["batch_size"])
+        transitions = self.memory.sample(self.config["BATCH_SIZE"])
         batch = Transition(*zip(*transitions))
 
         state_batch = torch.cat(batch.state)
@@ -119,7 +118,7 @@ class TrainingAgent():
         # Compute the expected Q values
         next_state_values = self.target_model(next_state_batch).max(1)[0]
         expected_q_values = (~done_batch * next_state_values *
-                             self.config["gamma"]) + reward_batch
+                             self.config["GAMMA"]) + reward_batch
 
         loss = self.loss(predicted_q_value, expected_q_values.unsqueeze(1))
 
@@ -131,9 +130,9 @@ class TrainingAgent():
         self.optimizer.step()
 
     def _adjust_learning_rate(self, episode):
-        delta = self.config["lr"] - self.config["lr_min"]
-        base = self.config["lr_min"]
-        rate = self.config["lr_decay"]
+        delta = self.config["LR"] - self.config["LR_MIN"]
+        base = self.config["LR_MIN"]
+        rate = self.config["LR_DECAY"]
         lr = base + delta * np.exp(-episode / rate)
         for param_group in self.optimizer.param_groups:
             param_group['lr'] = lr
@@ -142,7 +141,7 @@ class TrainingAgent():
         self.target_model.load_state_dict(self.model.state_dict())
 
     def fit(self):
-        self.memory = ReplayMemory(self.config["memory_size"])
+        self.memory = ReplayMemory(self.config["MEMORY_SIZE"])
         self.loss = F.smooth_l1_loss
 
         self.episode_durations = []
@@ -151,26 +150,26 @@ class TrainingAgent():
         reward_in_episode = 0
         epsilon = 1
 
-        for i_episode in range(self.config["num_episodes"]):
+        for i_episode in range(self.config["NUM_EPISODES"]):
             state = self.env.reset()
-            if i_episode >= self.config["warmup_episode"]:
+            if i_episode >= self.config["WARMUP_EPISODE"]:
                 epsilon = self._get_epsilon(i_episode -
-                                            self.config["warmup_episode"])
+                                            self.config["WARMUP_EPISODE"])
             for step in count():
                 action = self._choose_action(state, epsilon)
                 next_state, reward, done, _ = self.env.step(action)
 
                 self._remember(state, action, next_state, reward, done)
 
-                if i_episode >= self.config["warmup_episode"]:
+                if i_episode >= self.config["WARMUP_EPISODE"]:
                     self._train_model()
                     self._adjust_learning_rate(i_episode -
-                                               self.config["warmup_episode"] +
+                                               self.config["WARMUP_EPISODE"] +
                                                1)
-                    done = (step == self.config["max_steps_per_episode"] -
+                    done = (step == self.config["MAX_STEPS_PER_EPISODE"] -
                             1) or done
                 else:
-                    done = (step == 5 * self.config["max_steps_per_episode"] -
+                    done = (step == 5 * self.config["MAX_STEPS_PER_EPISODE"] -
                             1) or done
 
                 state = next_state
@@ -183,9 +182,9 @@ class TrainingAgent():
                     reward_in_episode = 0
                     self.plot_durations()
                     break
-            if i_episode % self.config["target_update"] == 0:
+            if i_episode % self.config["TARGET_UPDATE"] == 0:
                 self._update_target()
-            if i_episode % self.config["save_freq"] == 0:
+            if i_episode % self.config["SAVE_FREQ"] == 0:
                 self.save()
             self.last_episode = i_episode
 
@@ -220,8 +219,8 @@ class TrainingAgent():
         plt.title('Training...')
         ax1.set_xlabel('Episode')
         ax1.set_ylabel('Duration & Rewards')
-        ax1.set_ylim(-2 * self.config["max_steps_per_episode"],
-                     self.config["max_steps_per_episode"] + 10)
+        ax1.set_ylim(-2 * self.config["MAX_STEPS_PER_EPISODE"],
+                     self.config["MAX_STEPS_PER_EPISODE"] + 10)
         ax1.plot(self.episode_durations, color="C1", alpha=0.2)
         ax1.plot(self.reward_in_episode, color="C2", alpha=0.2)
         mean_steps = self._moving_average(self.episode_durations, periods=5)
@@ -327,7 +326,7 @@ if __name__ == "__main__":
                         type=int,
                         default=128,
                         help="Batch Size")
-    parser.add_argument("--gamma", type=float, default=0.99, help="Gamma")
+    parser.add_argument("--gamma", type=float, default=0.99, help="GAMMA")
     parser.add_argument("--eps_start",
                         type=float,
                         default=1.0,
@@ -394,6 +393,8 @@ if __name__ == "__main__":
     memory_size = args.memory
     num_episodes = args.episodes
 
+    start_time = time.time()
+
     agent = TrainingAgent(env=env,
                           batch_size=batch_size,
                           gamma=gamma,
@@ -413,92 +414,13 @@ if __name__ == "__main__":
 
     agent.fit()
 
-    # n_actions = env.action_space.n
-    # n_observation = env.observation_space.n
+    time_train = time.time() - start_time()
 
-    # policy_net = DQN(n_observation, n_actions).to(device)
-    # target_net = DQN(n_observation, n_actions).to(device)
-    # target_net.load_state_dict(policy_net.state_dict())
-    # target_net.eval()
-
-    # optimizer = optim.RMSprop(policy_net.parameters())
-    # memory = ReplayMemory(memory_size)
-
-    # steps_done = 0
-
-    # episode_durations = []
-    # episode_reward = []
-
-    # print("Start Training...")
-    # has_finished = False
-    # time_save = int(time.time())
-    # model_name = "DQN_{}.pt".format(time_save)
-    # eps_threshold = 1
-
-    # for i_episode in range(num_episodes):
-    #     state = env.reset()
-    #     reward_per_episode = 0
-    #     steps_per_episode = 0
-    #     if i_episode >= warmup_episode:
-    #         eps_threshold = eps_end + (eps_start - eps_end) * \
-    #             math.exp(-1. * steps_done / eps_decay)
-
-    #     for t in count():
-    #         # Select and perform an action
-    #         action, steps_done = select_action(state, eps_threshold,
-    #                                            steps_done)
-    #         next_state, reward, done, info = env.step(action)
-
-    #         memory.push(
-    #             torch.tensor([state], device=device),
-    #             torch.tensor([action], device=device, dtype=torch.long),
-    #             torch.tensor([next_state], device=device),
-    #             torch.tensor([reward], device=device),
-    #             torch.tensor([done], device=device, dtype=torch.bool))
-
-    #         if done:
-    #             has_finished = done
-
-    #         if i_episode >= warmup_episode:
-    #             policy_net, target_net, optimizer = optimize_model(
-    #                 batch_size, policy_net, target_net, optimizer)
-    #             lr, optimizer = adjust_learning_rate(
-    #                 i_episode - warmup_episode + 1, lr, lr_min, lr_decay,
-    #                 optimizer)
-    #             done = (t == max_steps_per_episode - 1) or done
-    #         else:
-    #             done = (t == 5 * max_steps_per_episode - 1) or done
-
-    #         state = next_state
-    #         reward_per_episode += reward
-
-    #         if done:
-    #             steps_per_episode = t
-    #             episode_durations.append(t + 1)
-    #             plot_durations(episode_durations, episode_reward,
-    #                            max_steps_per_episode)
-    #             break
-
-    #     episode_reward.append(reward_per_episode)
-    #     # Update the target network, copying all weights and biases in DQN
-    #     if i_episode % target_update == 0:
-    #         target_net.load_state_dict(policy_net.state_dict())
-    #         print(
-    #             "[{}/{} EPISODES] - Total Reward {} In {} Steps - Finished: {}"
-    #             .format(i_episode, num_episodes,
-    #                     np.mean(episode_reward[-target_update:]),
-    #                     steps_per_episode, has_finished))
-    #         has_finished = False
-    #     if i_episode % 1000 == 0 and i_episode != 0:
-    # if not os.path.isdir(f"./models/{time_save}"):
-    #     os.makedirs(f"./models/{time_save}")
-    #         torch.save(
-    #             {
-    #                 'model_state_dict': policy_net.state_dict(),
-    #                 'optimizer_state_dict': optimizer.state_dict(),
-    #                 "reward_in_episode": reward_per_episode,
-    #                 "episode_durations": steps_per_episode,
-    #             }, f"./models/{time_save}/DQN_{time_save}.pt")
+    print('Training Complete in {}s - {}min - {}h'.format(
+        time_train, np.round(time_train / 60, 2),
+        np.round(time_train / 3600, 2)))
+    print()
+    print("Testing...")
 
     mean_steps, mean_result, total_failed = 0, 0, 0
     for l in range(1000):
@@ -512,15 +434,15 @@ if __name__ == "__main__":
     df = pd.read_csv("models.csv", sep=";")
 
     new_row = [[
-        f"{agent.id}/DQN_{agent.id}.pt", agent.config["batch_size"],
-        agent.config["gamma"], agent.config["eps_start"],
-        agent.config["eps_end"], agent.config["eps_decay"],
-        agent.config["target_update"], agent.config["max_steps_per_episode"],
-        agent.config["warmup_episode"], agent.config["save_freq"],
-        agent.config["lr"], agent.config["lr_min"], agent.config["lr_decay"],
-        agent.config["memory_size"], agent.config["num_episodes"],
+        f"{agent.id}/DQN_{agent.id}.pt", agent.config["BATCH_SIZE"],
+        agent.config["GAMMA"], agent.config["EPS_START"],
+        agent.config["EPS_END"], agent.config["EPS_DECAY"],
+        agent.config["TARGET_UPDATE"], agent.config["MAX_STEPS_PER_EPISODE"],
+        agent.config["WARMUP_EPISODE"], agent.config["SAVE_FREQ"],
+        agent.config["LR"], agent.config["LR_MIN"], agent.config["LR_DECAY"],
+        agent.config["MEMORY_SIZE"], agent.config["NUM_EPISODES"],
         np.round(np.mean(agent.reward_in_episode[-100:]),
-                 2), percentage_success
+                 2), percentage_success, time_train
     ]]
     df2 = pd.DataFrame(new_row, columns=df.columns.values)
     new_df = pd.concat([df, df2])
@@ -528,22 +450,4 @@ if __name__ == "__main__":
 
     new_df.to_csv("models.csv", sep=";")
 
-    # df = pd.read_csv("models.csv", sep=";")
-
-    # new_row = [[
-    #     f"{time_save}/{model_name}", batch_size, gamma, eps_start, eps_end,
-    #     eps_decay, target_update, max_steps_per_episode, warmup_episode,
-    #     save_freq, lr, lr_min, lr_decay, memory_size, num_episodes,
-    #     np.round(np.mean(episode_reward[-100:]), 2), percentage_success
-    # ]]
-    # df2 = pd.DataFrame(new_row, columns=df.columns.values)
-    # new_df = pd.concat([df, df2])
-    # new_df.set_index('name', drop=True, inplace=True)
-
-    # new_df.to_csv("models.csv", sep=";")
-    # plt.savefig("models/{0}/DQN_{0}_graph.png".format(time_save))
-
-    print('Complete')
-    # env.close()
-    # plt.ioff()
-    # plt.show()
+    print("Testing Complete.")

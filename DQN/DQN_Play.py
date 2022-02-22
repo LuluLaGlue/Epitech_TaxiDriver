@@ -53,7 +53,7 @@ def play(model,
     while not done:
         action = get_action_for_state(state, model, device)
         iteration += 1
-        state, reward, done, info = env.step(action)
+        state, reward, done, _ = env.step(action)
         total_reward += reward
         display.clear_output(wait=True)
         if render:
@@ -102,7 +102,7 @@ if __name__ == "__main__":
                         dest="render",
                         action="store_true",
                         default=False,
-                        help="Render State")
+                        help="Render State for each Step")
     parser.add_argument("-l",
                         "--loop",
                         type=int,
