@@ -292,7 +292,7 @@ if __name__ == "__main__":
         f"{time_save}/{model_name}", batch_size, gamma, eps_start, eps_end,
         eps_decay, target_update, max_steps_per_episode, warmup_episode,
         save_freq, lr, lr_min, lr_decay, memory_size, num_episodes,
-        np.round(np.mean(episode_reward), 2)
+        np.round(np.mean(episode_reward[-100:]), 2)
     ]]
     df2 = pd.DataFrame(new_row, columns=df.columns.values)
     new_df = pd.concat([df, df2])
