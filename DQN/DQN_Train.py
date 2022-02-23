@@ -111,6 +111,7 @@ class TrainingAgent():
         epsilon = self.config["EPS_END"] + \
                           (self.config["EPS_START"] - self.config["EPS_END"]) * \
                               np.exp(-episode / self.config["EPS_DECAY"])
+
         return epsilon
 
     def _get_action_for_state(self, state):
@@ -120,6 +121,7 @@ class TrainingAgent():
             # found, so we pick action with the larger expected reward.
             predicted = self.model(torch.tensor([state], device=self.device))
             action = predicted.max(1)[1]
+
         return action.item()
 
     def _choose_action(self, state, epsilon):
@@ -127,6 +129,7 @@ class TrainingAgent():
             action = self.env.action_space.sample()
         else:
             action = self._get_action_for_state(state)
+
         return action
 
     def _remember(self, state, action, next_state, reward, done):
@@ -139,6 +142,7 @@ class TrainingAgent():
 
     def _train_model(self):
         if len(self.memory) < self.config["BATCH_SIZE"]:
+
             return
         transitions = self.memory.sample(self.config["BATCH_SIZE"])
         batch = Transition(*zip(*transitions))
@@ -165,6 +169,7 @@ class TrainingAgent():
         loss.backward()
         for param in self.model.parameters():
             param.grad.data.clamp_(-1, 1)
+
         self.optimizer.step()
 
     def _adjust_learning_rate(self, episode):
@@ -225,9 +230,12 @@ class TrainingAgent():
                     self.epsilon_vec.append(epsilon)
                     reward_in_episode = 0
                     self.plot_durations()
+
                     break
+
             if i_episode % self.config["TARGET_UPDATE"] == 0:
                 self._update_target()
+
             if i_episode % (self.config["SAVE_FREQ"] / 2) == 0:
                 print(
                     "[EPISODE {}/{}] - {}min - Mean reward for last {} Episodes: {} in {} steps"
@@ -246,22 +254,29 @@ class TrainingAgent():
                                 episode_durations[-self.config["SAVE_FREQ"]:]),
                             2)))
                 start = time.time()
+
             if i_episode % self.config["SAVE_FREQ"] == 0:
                 self.save()
+
             self.last_episode = i_episode
+
         self.save()
 
     @staticmethod
     def _moving_average(x, periods=5):
         if len(x) < periods:
+
             return x
+
         cumsum = np.cumsum(np.insert(x, 0, 0))
         res = (cumsum[periods:] - cumsum[:-periods]) / periods
+
         return np.hstack([x[:periods - 1], res])
 
     def save(self):
         if not os.path.isdir(f"./models/{self.id}"):
             os.makedirs(f"./models/{self.id}")
+
         torch.save(
             {
                 'model_state_dict': self.model.state_dict(),
@@ -279,7 +294,7 @@ class TrainingAgent():
         plt.clf()
         ax1 = fig.add_subplot(111)
 
-        plt.title('Training...')
+        plt.title(f'Training {self.id}...')
         ax1.set_xlabel('Episode')
         ax1.set_ylabel('Duration & Rewards')
         ax1.set_ylim(-2 * self.config["MAX_STEPS_PER_EPISODE"],
