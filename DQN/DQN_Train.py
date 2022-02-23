@@ -1,4 +1,5 @@
 import os
+import sys
 import gym
 import time
 import argparse
@@ -9,13 +10,10 @@ from DQN_Play import play
 from Memory import Transition, ReplayMemory
 from itertools import count
 import matplotlib.pyplot as plt
-from collections import namedtuple, deque
 
 import torch
 import torch.optim as optim
 import torch.nn.functional as F
-
-plt.ion()
 
 
 class TrainingAgent():
@@ -35,7 +33,8 @@ class TrainingAgent():
                  lr_min=0.0001,
                  lr_decay=5000,
                  memory_size=50000,
-                 num_episodes=10000):
+                 num_episodes=10000,
+                 name=None):
         self.config = {
             "BATCH_SIZE": batch_size,
             "GAMMA": gamma,
@@ -50,13 +49,52 @@ class TrainingAgent():
             "LR_MIN": lr_min,
             "LR_DECAY": lr_decay,
             "MEMORY_SIZE": memory_size,
-            "NUM_EPISODES": num_episodes
+            "NUM_EPISODES": num_episodes,
+            "SHOULD_WARMUP": True
         }
-        self.rng = np.random.default_rng(42)
+        self.episode_durations = []
+        self.reward_in_episode = []
+        self.epsilon_vec = []
+
         self.device = torch.device(
             "cuda" if torch.cuda.is_available() else "cpu")
         self.env = env
-        self.id = int(time.time())
+        self.id = int(time.time()) if name == None else name
+        self.rng = np.random.default_rng(123)
+
+    def import_model(self, id):
+        '''Need to rework config so that it does not restart entirely'''
+        try:
+            n_actions = self.env.action_space.n
+            n_observations = self.env.observation_space.n
+            self.id = id
+
+            self.model = DQN(n_observations, n_actions).to(self.device)
+            self.target_model = DQN(n_observations, n_actions).to(self.device)
+            self.optimizer = optim.Adam(self.model.parameters(),
+                                        lr=self.config["LR"])
+
+            checkpoint = torch.load(f"./models/{id}/DQN_{id}.pt")
+            self.model.load_state_dict(checkpoint["model_state_dict"])
+            self.optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
+            self.target_model.load_state_dict(self.model.state_dict())
+            self.target_model.eval()
+
+            self.reward_in_episode = checkpoint["reward_in_episode"]
+            self.episode_durations = checkpoint["episode_durations"]
+            self.epsilon_vec = checkpoint["epsilon_vec"]
+
+            self.config = checkpoint["config"]
+
+            if len(self.episode_durations) - 1 > self.config["WARMUP_EPISODE"]:
+                self.config["SHOULD_WARMUP"] = False
+        except:
+            print("[WARNING] - Unable to Import Model")
+            if input("Do you wish to create a new model ? [y/n] ").lower(
+            ) == "y":
+                self.compile()
+            else:
+                sys.exit(0)
 
     def compile(self):
         n_actions = self.env.action_space.n
@@ -144,24 +182,30 @@ class TrainingAgent():
         self.memory = ReplayMemory(self.config["MEMORY_SIZE"])
         self.loss = F.smooth_l1_loss
 
-        self.episode_durations = []
-        self.reward_in_episode = []
-        self.epsilon_vec = []
+        episode_done = len(self.episode_durations)
         reward_in_episode = 0
-        epsilon = 1
+        epsilon = 1 if self.config["SHOULD_WARMUP"] else self.epsilon_vec[-1]
+        start = time.time()
 
-        for i_episode in range(self.config["NUM_EPISODES"]):
+        for i_episode in range(self.config["NUM_EPISODES"] - episode_done):
             state = self.env.reset()
-            if i_episode >= self.config["WARMUP_EPISODE"]:
+            if i_episode >= self.config["WARMUP_EPISODE"] and self.config[
+                    "SHOULD_WARMUP"]:
                 epsilon = self._get_epsilon(i_episode -
                                             self.config["WARMUP_EPISODE"])
+            elif not self.config["SHOULD_WARMUP"]:
+                epsilon = self._get_epsilon(
+                    len(self.episode_durations) -
+                    self.config["WARMUP_EPISODE"])
+
             for step in count():
                 action = self._choose_action(state, epsilon)
                 next_state, reward, done, _ = self.env.step(action)
 
                 self._remember(state, action, next_state, reward, done)
 
-                if i_episode >= self.config["WARMUP_EPISODE"]:
+                if i_episode >= self.config[
+                        "WARMUP_EPISODE"] or not self.config["SHOULD_WARMUP"]:
                     self._train_model()
                     self._adjust_learning_rate(i_episode -
                                                self.config["WARMUP_EPISODE"] +
@@ -184,9 +228,28 @@ class TrainingAgent():
                     break
             if i_episode % self.config["TARGET_UPDATE"] == 0:
                 self._update_target()
+            if i_episode % (self.config["SAVE_FREQ"] / 2) == 0:
+                print(
+                    "[EPISODE {}/{}] - {}min - Mean reward for last {} Episodes: {} in {} steps"
+                    .format(
+                        i_episode + episode_done, self.config["NUM_EPISODES"],
+                        int((time.time() - start) / 60),
+                        self.config["SAVE_FREQ"],
+                        np.round(
+                            np.mean(
+                                self.
+                                reward_in_episode[-self.config["SAVE_FREQ"]:]),
+                            2),
+                        np.round(
+                            np.mean(
+                                self.
+                                episode_durations[-self.config["SAVE_FREQ"]:]),
+                            2)))
+                start = time.time()
             if i_episode % self.config["SAVE_FREQ"] == 0:
                 self.save()
             self.last_episode = i_episode
+        self.save()
 
     @staticmethod
     def _moving_average(x, periods=5):
@@ -238,82 +301,6 @@ class TrainingAgent():
         plt.show()
         plt.pause(0.001)
 
-
-# def adjust_learning_rate(episode, lr, lr_min, lr_decay, optimizer):
-#     delta = lr - lr_min
-#     base = lr_min
-#     rate = lr_decay
-#     lr = base + delta * np.exp(-episode / rate)
-#     for param_group in optimizer.param_groups:
-#         param_group['lr'] = lr
-
-#     return lr, optimizer
-
-# def select_action(state, epsilon, steps_done):
-#     # global steps_done
-#     sample = random.random()
-#     steps_done += 1
-#     if sample > epsilon:
-#         with torch.no_grad():
-#             # t.max(1) will return largest column value of each row.
-#             # second column on max result is index of where max element was
-#             # found, so we pick action with the larger expected reward.
-#             return policy_net(torch.tensor(
-#                 [state])).max(1)[1].item(), steps_done  #.view(1, 1)
-#     else:
-#         return env.action_space.sample(), steps_done
-
-# def plot_durations(episode_durations, episode_reward, max_steps_per_episode):
-#     plt.figure(1)
-#     plt.clf()
-#     durations_t = torch.tensor(episode_durations, dtype=torch.float)
-#     reward_t = torch.tensor(episode_reward, dtype=torch.float)
-#     plt.title('Training...')
-#     plt.xlabel('Episode')
-#     plt.ylabel('Duration & Reward')
-#     plt.ylim(max_steps_per_episode * -2, max_steps_per_episode + 10)
-#     plt.plot(durations_t.numpy())
-#     plt.plot(reward_t.numpy())
-
-#     plt.pause(0.001)  # pause a bit so that plots are updated
-#     if is_ipython:
-#         display.clear_output(wait=True)
-#         display.display(plt.gcf())
-
-# def optimize_model(batch_size, policy_net, target_net, optimizer):
-#     if len(memory) < batch_size:
-#         return
-#     transitions = memory.sample(batch_size)
-
-#     batch = Transition(*zip(*transitions))
-
-#     state_batch = torch.cat(batch.state)
-#     action_batch = torch.cat(batch.action)
-#     reward_batch = torch.cat(batch.reward)
-#     next_state_batch = torch.cat(batch.next_state)
-#     done_batch = torch.cat(batch.done)
-
-#     # Compute predicted Q values
-#     predicted_q_value = policy_net(state_batch).gather(
-#         1, action_batch.unsqueeze(1))
-
-#     # Compute the expected Q values
-#     next_state_values = target_net(next_state_batch).max(1)[0]
-#     expected_q_values = (~done_batch * next_state_values *
-#                          gamma) + reward_batch
-
-#     # Compute loss
-#     criterion = nn.SmoothL1Loss()
-#     loss = criterion(predicted_q_value, expected_q_values.unsqueeze(1))
-
-#     # Optimize the model
-#     optimizer.zero_grad()
-#     loss.backward()
-#     for param in policy_net.parameters():
-#         param.grad.data.clamp_(-1, 1)
-#     optimizer.step()
-
-#     return policy_net, target_net, optimizer
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
@@ -375,6 +362,16 @@ if __name__ == "__main__":
                         type=int,
                         default=10000,
                         help="Number of episodes during training")
+    parser.add_argument(
+        "--model",
+        type=str,
+        default="",
+        help="Import existing model",
+    )
+    parser.add_argument("--name",
+                        type=str,
+                        default=None,
+                        help="Name for the model")
 
     args = parser.parse_args()
     env = gym.make(args.environment).env
@@ -392,9 +389,12 @@ if __name__ == "__main__":
     lr_decay = args.lr_decay
     memory_size = args.memory
     num_episodes = args.episodes
+    existing_model = args.model
+    name = args.name
 
     start_time = time.time()
 
+    plt.ion()
     agent = TrainingAgent(env=env,
                           batch_size=batch_size,
                           gamma=gamma,
@@ -409,12 +409,17 @@ if __name__ == "__main__":
                           lr_min=lr_min,
                           lr_decay=lr_decay,
                           memory_size=memory_size,
-                          num_episodes=num_episodes)
-    agent.compile()
+                          num_episodes=num_episodes,
+                          name=name)
+
+    if len(existing_model) != 0:
+        agent.import_model(existing_model)
+    else:
+        agent.compile()
 
     agent.fit()
 
-    time_train = time.time() - start_time()
+    time_train = time.time() - start_time
 
     print('Training Complete in {}s - {}min - {}h'.format(
         time_train, np.round(time_train / 60, 2),
@@ -424,13 +429,16 @@ if __name__ == "__main__":
 
     mean_steps, mean_result, total_failed = 0, 0, 0
     for l in range(1000):
-        steps, result, done = play(agent.model)
+        steps, result, done = play(agent.model, silent=True)
         mean_steps += steps
         mean_result += result
         if not done:
             total_failed += 1
     percentage_success = np.round((1 - total_failed / 1000) * 100, 2)
 
+    print("Testing Complete.{}% Win Rate".format(percentage_success))
+    print()
+    print("Saving Metrics to models.csv...")
     df = pd.read_csv("models.csv", sep=";")
 
     new_row = [[
@@ -442,12 +450,13 @@ if __name__ == "__main__":
         agent.config["LR"], agent.config["LR_MIN"], agent.config["LR_DECAY"],
         agent.config["MEMORY_SIZE"], agent.config["NUM_EPISODES"],
         np.round(np.mean(agent.reward_in_episode[-100:]),
-                 2), percentage_success, time_train
+                 2), percentage_success
     ]]
     df2 = pd.DataFrame(new_row, columns=df.columns.values)
     new_df = pd.concat([df, df2])
     new_df.set_index('name', drop=True, inplace=True)
 
     new_df.to_csv("models.csv", sep=";")
+    print("Metrics Saved.")
 
-    print("Testing Complete.")
+    plt.ioff()

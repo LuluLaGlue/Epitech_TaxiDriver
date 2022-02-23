@@ -38,7 +38,8 @@ def play(model,
          env=gym.make("Taxi-v3").env,
          render: bool = False,
          max_steps: int = 100,
-         slow: bool = False):
+         slow: bool = False,
+         silent: bool = False):
     # Play an episode
     actions_str = ["South", "North", "East", "West", "Pickup", "Dropoff"]
 
@@ -66,9 +67,9 @@ def play(model,
         elif slow and not done:
             input("Press anything to continue...")
             print("\r", end="\r")
-
-    print("[{}/{} MOVES] - Total reward: {}".format(iteration, max_steps,
-                                                    total_reward))
+    if not silent:
+        print("[{}/{} MOVES] - Total reward: {}".format(
+            iteration, max_steps, total_reward))
 
     return iteration, total_reward, done
 
