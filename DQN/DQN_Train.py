@@ -377,12 +377,10 @@ if __name__ == "__main__":
                         type=int,
                         default=10000,
                         help="Number of episodes during training")
-    parser.add_argument(
-        "--model",
-        type=str,
-        default="",
-        help="Import existing model",
-    )
+    parser.add_argument("--model",
+                        type=str,
+                        default="",
+                        help="Import existing model")
     parser.add_argument("--name",
                         type=str,
                         default=None,
