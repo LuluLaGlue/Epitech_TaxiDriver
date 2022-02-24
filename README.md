@@ -40,8 +40,29 @@ In order to shorten the training time we tried to implement the SARSA algorithm.
 ### DQN
 In order to train a model capable of accomplishing more complexe tasks we turned to Deep Q Learning. This attempt is located in the *DQN* directory with the following files:
 - ***DQN_Train.py***: A python script used to train and save a new model. To run it use <code>python DQN_Train.py</code> with the following possible arguments:
+    + <code>--environment</code>.Environment in which to train the model. **Default**: Taxi-v3
+    + <code>--batch_size</code>. Batch Size during training. **Default**: 128
+    + <code>--gamma</code>. Gamma. **Default**: 0.99
+    + <code>--eps_start</code>. Starting Epsilon Value. **Default**: 1
+    + <code>--eps_end</code>. Minimal Epsilon Value. **Default**: 0.1
+    + <code>--eps_decay</code>. Decay Rate for Epsilon Value. **Default**: 400
+    + <code>--target_update</code>. Number of episodes between each model update. **Default**: 20
+    + <code>--max_steps</code>: Max Steps Allowed per Episode. **Default**: 100
+    + <code>--warmup_episode</code>: Number of warmup episodes. **Default**: 20
+    + <code>--save_freq</code>: Number of episodes between each model saving. **Default**: 1000
+    + <code>--lr</code>: Initial Learning Rate. **Default**: 0.001
+    + <code>--lr_min</code>: Minimal Learning Rate: **Default**: 0.0001
+    + <code>--lr_decay</code>: Learning Rate Decay Speed: **Default**: 5000
+    + <code>--memory</code>: Size of Memory. **Default**: 50000
+    + <code>--name</code>: Name to give the resulting model. **Default**: Timestamp
+    + <code>--model</code>: Path to a previously created model to further train (When resuming training, will take the previously set parameters)
+    + <code>--episodes</code>: Number of episodes during training. **Default**: 10000
     + <code>-h</code>: Display a help message.
 - ***DQN.py***: A python Class that contains our DQN model.
 - ***models/***: This folder contains a few models trained using the ***DQN_Train.py*** with varying parameters.
 - ***DQN_Play.py***: A python script used to play the Taxi Game based on a previously trained model (***models/***). To run it, use <code>python DQN_Play.py</code> with the following possible arguments:
+    + <code>-p</code>: Path to model to use. **Default**: <code>./models/reference/DQN_reference.pt</code>
+    + <code>-s</code>: Activate Slow Mode.
+    + <code>-r</code>: Activate Render.
+    + <code>-l</code>: Set a number of times to play the game (equivalent to *episodes* during training). **Default**: 1
     + <code>-h</code>: Display a help message.

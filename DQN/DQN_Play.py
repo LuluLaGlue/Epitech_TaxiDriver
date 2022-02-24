@@ -80,7 +80,7 @@ if __name__ == "__main__":
     parser.add_argument("-p",
                         "--path",
                         type=str,
-                        default="./models/DQN_1645447309_almost_converge.pt",
+                        default="./models/reference/DQN_reference.pt",
                         help="DQN model to use")
     parser.add_argument(
         "-m",
