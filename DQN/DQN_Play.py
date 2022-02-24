@@ -2,21 +2,23 @@ import gym
 import torch
 import argparse
 import numpy as np
-from DQN import DQN
+from DQN import DQN, DQN_2
 from IPython import display
-
 import torch.optim as optim
 
 
 def import_model(path):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    checkpoint = torch.load(path)
 
     n_actions = env.action_space.n
     n_observation = env.observation_space.n
-    model = DQN(n_observation, n_actions).to(device)
+    model = DQN(n_observation, n_actions).to(
+        device) if checkpoint.get("architecture") == 1 or checkpoint.get(
+            "architecture") == None else DQN_2(n_observation,
+                                               n_actions).to(device)
     optimizer = optim.RMSprop(model.parameters())
 
-    checkpoint = torch.load(path)
     model.load_state_dict(checkpoint['model_state_dict'])
     optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
 

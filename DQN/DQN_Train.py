@@ -5,11 +5,11 @@ import time
 import argparse
 import numpy as np
 import pandas as pd
-from DQN import DQN
 from DQN_Play import play
-from Memory import Transition, ReplayMemory
+from DQN import DQN, DQN_2
 from itertools import count
 import matplotlib.pyplot as plt
+from Memory import Transition, ReplayMemory
 
 import torch
 import torch.optim as optim
@@ -34,7 +34,8 @@ class TrainingAgent():
                  lr_decay=5000,
                  memory_size=50000,
                  num_episodes=10000,
-                 name=None):
+                 name=None,
+                 architecture=1):
         self.config = {
             "BATCH_SIZE": batch_size,
             "GAMMA": gamma,
@@ -61,6 +62,7 @@ class TrainingAgent():
         self.env = env
         self.id = int(time.time()) if name == None else name
         self.rng = np.random.default_rng(123)
+        self.architecture = architecture
 
     def import_model(self, id):
         '''Need to rework config so that it does not restart entirely'''
@@ -68,13 +70,19 @@ class TrainingAgent():
             n_actions = self.env.action_space.n
             n_observations = self.env.observation_space.n
             self.id = id
+            self.architecture = checkpoint.get("architecture") or 1
 
-            self.model = DQN(n_observations, n_actions).to(self.device)
-            self.target_model = DQN(n_observations, n_actions).to(self.device)
+            checkpoint = torch.load(f"./models/{id}/DQN_{id}.pt")
+
+            self.model = DQN(n_observations, n_actions).to(
+                self.device) if self.architecture == 1 else DQN_2(
+                    n_observations, n_actions).to(self.device)
+            self.target_model = DQN(n_observations, n_actions).to(
+                self.device) if self.architecture == 1 else DQN_2(
+                    n_observations, n_actions).to(self.device)
             self.optimizer = optim.Adam(self.model.parameters(),
                                         lr=self.config["LR"])
 
-            checkpoint = torch.load(f"./models/{id}/DQN_{id}.pt")
             self.model.load_state_dict(checkpoint["model_state_dict"])
             self.optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
             self.target_model.load_state_dict(self.model.state_dict())
@@ -100,8 +108,12 @@ class TrainingAgent():
         n_actions = self.env.action_space.n
         n_observations = self.env.observation_space.n
 
-        self.model = DQN(n_observations, n_actions).to(self.device)
-        self.target_model = DQN(n_observations, n_actions).to(self.device)
+        self.model = DQN(n_observations, n_actions).to(
+            self.device) if self.architecture == 1 else DQN_2(
+                n_observations, n_actions).to(self.device)
+        self.target_model = DQN(n_observations, n_actions).to(
+            self.device) if self.architecture == 1 else DQN_2(
+                n_observations, n_actions).to(self.device)
         self.target_model.load_state_dict(self.model.state_dict())
         self.target_model.eval()
         self.optimizer = optim.Adam(self.model.parameters(),
@@ -284,7 +296,8 @@ class TrainingAgent():
                 "reward_in_episode": self.reward_in_episode,
                 "episode_durations": self.episode_durations,
                 "epsilon_vec": self.epsilon_vec,
-                "config": self.config
+                "config": self.config,
+                "architecture": self.architecture
             }, f"./models/{self.id}/DQN_{self.id}.pt")
         plt.savefig(f"./models/{self.id}/DQN_{self.id}_graph.png")
 
@@ -385,6 +398,10 @@ if __name__ == "__main__":
                         type=str,
                         default=None,
                         help="Name for the model")
+    parser.add_argument("--architecture",
+                        type=int,
+                        default=1,
+                        help="Model Architecture to use (1/2)")
 
     args = parser.parse_args()
     env = gym.make(args.environment).env
@@ -404,6 +421,7 @@ if __name__ == "__main__":
     num_episodes = args.episodes
     existing_model = args.model
     name = args.name
+    architecture = args.architecture
 
     start_time = time.time()
 
@@ -423,7 +441,8 @@ if __name__ == "__main__":
                           lr_decay=lr_decay,
                           memory_size=memory_size,
                           num_episodes=num_episodes,
-                          name=name)
+                          name=name,
+                          architecture=architecture)
 
     if len(existing_model) != 0:
         agent.import_model(existing_model)
