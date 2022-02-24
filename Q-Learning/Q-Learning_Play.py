@@ -28,6 +28,9 @@ def play(slow=False, render=False):
             env.render()
         steps += 1
 
+        if steps >= 100:
+            break
+
         if slow:
             input("Press anything to continue...")
             print("\r", end="\r")
@@ -63,13 +66,18 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     mean_steps, mean_result = 0, 0
+    total_failed = 0
+
     for l in range(args.loop):
         steps, result = play(slow=args.slow, render=args.render)
         mean_steps += steps
         mean_result += result
+        if steps >= 100:
+            total_failed += 1
 
     if args.loop > 1:
         print(
-            "[{} LOOP DONE] - Mean Steps Per Loop: {} - Mean Reward Per Loop: {}"
-            .format(args.loop, np.round(mean_steps / args.loop, 2),
+            "[{} LOOP DONE - {}% FAILED] - Mean Steps Per Loop: {} - Mean Reward Per Loop: {}"
+            .format(args.loop, np.round(total_failed / args.loop * 100, 2),
+                    np.round(mean_steps / args.loop, 2),
                     np.round(mean_result / args.loop, 2)))
