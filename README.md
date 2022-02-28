@@ -1,6 +1,21 @@
 # Taxi Driver
 
-This repository contains our attempt at Reinforcement Learning, the goal of this project is to train an AI capable of picking up a passanger in a random spot and driving him to another random spot on a map.
+This repository contains our attempt at Reinforcement Learning, the goal of this project is to train an AI capable of picking up a passanger in a random spot and driving him to another random spot on a map. To do so we worked with *OpenAI*'s *gym*'s *Taxi* environment.
+
+In this environment there are 4 different locations indicated by *R(ed)*, *B(lue)*, *Y(ellow)*, *G(reen)*. At the start of an episode, the taxi starts off at a random square and the passenger is at a random location (*R*, *B*, *Y* or *G*). The taxi must drive to the passenger's location, pick him up, drive him to his destination (another random location) and drop him off. Once the passenger is dropped off the episode ends. The Taxi can not go through walls.
+
+There are *6* possible actions:
+- *0*: Go *South* (or *down*),
+- *1*: Go *North* (or *up*),
+- *2*: Go *East* (or *right*),
+- *3*: Go *West* (or *left*),
+- *4*: *Pickup* the passenger,
+- *5*: *Dropoff* the passenger.
+
+Each action taken by the agent will result in a reward:
+- *Moving* results in a **-1** reward, this will guide the agent towards more efficient path between objectives,
+- *picking up* or *dropping off* at a forbidden location results in a **-20** reward, this will guide the agent towards not *spamming* the *dropoff* and *pickup* actions,
+- *dropping off* the passenger at the correct location results in a **+20** reward, this will guide the agent towards completing the objective.
 
 # Algorithms
 
