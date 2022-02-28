@@ -43,7 +43,6 @@ def play(model,
          render: bool = False,
          max_steps: int = 100,
          slow: bool = False,
-         silent: bool = False,
          is_loop: bool = False):
     # Play an episode
     actions_str = ["South", "North", "East", "West", "Pickup", "Dropoff"]
@@ -72,7 +71,7 @@ def play(model,
         elif slow and not done:
             input("Press anything to continue...")
             print("\r", end="\r")
-    if not silent:
+    if not is_loop or iteration >= 100:
         print("[{}/{} MOVES] - Total reward: {}".format(
             iteration, max_steps, total_reward))
 

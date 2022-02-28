@@ -2,6 +2,8 @@
 
 This repository contains our attempt at Reinforcement Learning, the goal of this project is to train an AI capable of picking up a passanger in a random spot and driving him to another random spot on a map.
 
+# Algorithms
+
 ## Value Iteration Algorithm
 One of the first algorithm used for reinforcement learning was the *Value Iteration Algorithm*, its core idea is to calculate the value of each state. It loops over all states and possible actions to explore rewards of a given action and calculates the maximum possible action/reward and stores it in a table. This solution can be found in the *Value Iteration* directory with the following files:
 - ***VI_Train.py***: A python script used to train and save a new table (or model). To run it, use <code>python VI_Train.py</code> with the following possible arguments:
@@ -13,10 +15,12 @@ One of the first algorithm used for reinforcement learning was the *Value Iterat
     + <code>-r</code>: Activate Render.
     + <code>-l</code>: Set a number of times to play the game.
     + <code>-h</code>: Display a help message.
+Per its trainig logic this approach is is model based as we have to know all environment states/transitions upfront so the algorithm works.
+
 ## Q Learning
-In order to train a model capable of completing the task at hand we decided to use the Q Learning algorithm. This attempt is located in the *Q-Learning* directory with the following files:
+In order to train a model capable of completing the task at hand without being model based we decided to use the Q Learning algorithm. This algorithm is centred around the actor (the Taxi in our case) and starts exploring on trial-and-error to update its knowledge about the model (= path to the best reward). During training, this algorithm will update a matrice containing the maximum discounted future reward for each action and state. It is based on the Bellman equation extended with a learning rate (we set it by default to *0.01*). This attempt is located in the *Q-Learning* directory with the following files:
 - ***Q-Learning_Train.py***: A python script used to train and save a new model (or Q Table) to run it use <code>python Q-Learning_Train.py</code> with the following possible arguments:
-    + <code>-l</code>: Learning Rate. **Default**: 0.99
+    + <code>-l</code>: Learning Rate. **Default**: 0.01
     + <code>-g</code>: Gamma or Discount Rating. **Default**: 0.99
     + <code>--episodes</code>: Number of episodes to run during training. **Default**: 25000
     + <code>-e</code>: Epsilon or Exploration Rate. **Default**: 1
@@ -29,9 +33,10 @@ In order to train a model capable of completing the task at hand we decided to u
     + <code>-r</code>: Activate Render.
     + <code>-l</code>: Set a number of times to play the game (equivalent to *episodes* during training)
     + <code>-h</code>: Display a help message.
+This approach is effective in our case as the only positive reward is the correct dropoff of the passenger. If the environment were to contain another positive reward the trial-and-error approach might optimize the route to it and miss out on the real goal of the game it is learning to play. In order to to limit this we implemented the Epsilon Decreasing method which consists of exploiting the current situation with probability <code>1 - epsilon</code> and exploring a new option with probability <code>epsilon</code> with epsilon decreasing over time. The Epsilon Decreasing method is particularly effective in environment such as Frozen Lakes where the game actions are not deterministic.
 
 ## SARSA
-In order to shorten the training time we tried to implement the SARSA algorithm. This attempt is located in the *SARSA* directory with the following files:
+In order to shorten the training time and explore other possible algorithm we tried to implement the SARSA algorithm. This attempt is located in the *SARSA* directory with the following files:
 - ***SARSA_Train.py***: A python script used to train and save a new model (or Q Table), to run it use <code>python SARSA_Train.py</code> with the following possible arguments:
     + <code>-a</code>: Alpha. **Default**: 0.85
     + <code>-g</code>: Gamma or Discount Rating. **Default**: 0.99 (We first tried with *0.95* but the resulting model was not effective enough)
@@ -48,7 +53,7 @@ In order to shorten the training time we tried to implement the SARSA algorithm.
     + <code>-h</code>: Display a help message.
 
 ## DQN
-In order to train a model capable of accomplishing more complexe tasks we turned to Deep Q Learning. This attempt is located in the *DQN* directory with the following files:
+In order to train a model capable of accomplishing more complexe tasks we turned to Deep Q Learning. Indeed, the algorithm showcased before are perfect for small environment such as the Taxi driver or Frozen Lake but in more complexe environment with a lot more observation space (an Atari Video Game for exemple) they will quickly be unmanageable. Furthermore, the Q-Agent has no ability to estimate value for an unseen state, it will go back at best to to random actions. To deal with this problem *Deep Q Learning* algorithm remove the two dimensional Q-Matrix and replace it with a Neural Network. This attempt is located in the *DQN* directory with the following files:
 - ***DQN_Train.py***: A python script used to train and save a new model. To run it use <code>python DQN_Train.py</code> with the following possible arguments:
     + <code>--environment</code>.Environment in which to train the model. **Default**: Taxi-v3
     + <code>--batch_size</code>. Batch Size during training. **Default**: 128
@@ -67,7 +72,7 @@ In order to train a model capable of accomplishing more complexe tasks we turned
     + <code>--name</code>: Name to give the resulting model. **Default**: Timestamp
     + <code>--model</code>: Path to a previously created model to further train (When resuming training, will take the previously set parameters)
     + <code>--episodes</code>: Number of episodes during training. **Default**: 10000
-    + <code>--architecture</code>: Architecture to use (1 or 2): **Default**: 1
+    + <code>--architecture</code>: Architecture to use (1 or 2): **Default**: 2
     + <code>-h</code>: Display a help message.
 - ***DQN.py***: A python Class that contains our DQN models (DQN and DQN_2).
 - ***models/***: This folder contains a few models trained using the ***DQN_Train.py*** with varying parameters.
@@ -77,3 +82,7 @@ In order to train a model capable of accomplishing more complexe tasks we turned
     + <code>-r</code>: Activate Render.
     + <code>-l</code>: Set a number of times to play the game (equivalent to *episodes* during training). **Default**: 1
     + <code>-h</code>: Display a help message.
+
+# Conclusions
+
+For every algorithm/approach we tried, we manage to setup a fonctionnal agent capable of effectively completing the game. We started with the Value Iteration algorithm which took *48.96* secondes to solve the game *10 000* times with an average *14.06* steps and *7.94* reward per episode and a *100%* win rate. We then used the *Q-Learning* algorithm based on a Q-Matrix and trained it with several parameters (we settled with <code>gamma = 0.99</code>, <code>Learning Rate = 0.01</code>, <code>minimal epsilon = 0.001</code> and <code>Decay Rate = 0.01</code>), the resulting model takes *50.32* secondes to solve the game *10 000* times with an average *15.35* steps and *6.33* reward per episode and a *98.48%* win rate. In order to improve those metrics we used the *SARSA* algorithm and tuned it in the same way as the *Q-Learning* one (we settled with <code>alpha = 0.85</code>, <code>gamma = 0.99</code>, <code>minimal epsilon = 0.001</code> and <code>Decay Rate = 0.01</code>) we managed to solve the game *10 000* times in *49.43* secondes with an average *16.18* steps and *-7.13* reward per episode and a *98.56%* win rate. Finally, we trained 2 *Deep Q Learning* algorithm based on 2 different architectures, after fine tuning the parameters we settled with <code>batch_size = 128</code>, <code>gamma = 0.99</code>, <code>minimal epsilon = 0.1</code>, <code>epsilon decay = 400</code>, <code>number of episodes betzeen each model update = 20</code>, <code>max number of steps per episode = 100</code>, <code>save frequency = 1000</code>, <code>learning rate = 0.001</code>, <code>minimal learning rate = 0.0001</code>, <code>learning rate decay = 5000</code>, <code>memory size = 50000</code>, <code>architecture = 2</code>. With the best architecture and parameters we trained we achieved *10 000* games in *17.82* secondes with an average *13.10* steps and *7.90* reward per episode and a *100%* win rate.

@@ -37,7 +37,8 @@ def play(slow=False, render=False, is_loop=False):
             input("Press anything to continue...")
             print("\r", end="\r")
 
-    print("[{} MOVES] - Total reward: {}".format(steps, result))
+    if not is_loop or steps >= 100:
+        print("[{} MOVES] - Total reward: {}".format(steps, result))
 
     return steps, result
 

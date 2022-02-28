@@ -35,7 +35,7 @@ class TrainingAgent():
                  memory_size=50000,
                  num_episodes=10000,
                  name=None,
-                 architecture=1):
+                 architecture=2):
         self.config = {
             "BATCH_SIZE": batch_size,
             "GAMMA": gamma,
@@ -402,7 +402,7 @@ if __name__ == "__main__":
                         help="Name for the model")
     parser.add_argument("--architecture",
                         type=int,
-                        default=1,
+                        default=2,
                         help="Model Architecture to use (1/2)")
 
     args = parser.parse_args()
