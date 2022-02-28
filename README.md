@@ -15,6 +15,7 @@ One of the first algorithm used for reinforcement learning was the *Value Iterat
     + <code>-r</code>: Activate Render.
     + <code>-l</code>: Set a number of times to play the game.
     + <code>-h</code>: Display a help message.
+
 Per its trainig logic this approach is is model based as we have to know all environment states/transitions upfront so the algorithm works.
 
 ## Q Learning
@@ -33,6 +34,7 @@ In order to train a model capable of completing the task at hand without being m
     + <code>-r</code>: Activate Render.
     + <code>-l</code>: Set a number of times to play the game (equivalent to *episodes* during training)
     + <code>-h</code>: Display a help message.
+
 This approach is effective in our case as the only positive reward is the correct dropoff of the passenger. If the environment were to contain another positive reward the trial-and-error approach might optimize the route to it and miss out on the real goal of the game it is learning to play. In order to to limit this we implemented the Epsilon Decreasing method which consists of exploiting the current situation with probability <code>1 - epsilon</code> and exploring a new option with probability <code>epsilon</code> with epsilon decreasing over time. The Epsilon Decreasing method is particularly effective in environment such as Frozen Lakes where the game actions are not deterministic.
 
 ## SARSA
