@@ -13,9 +13,9 @@ There are *6* possible actions:
 - *5*: *Dropoff* the passenger.
 
 Each action taken by the agent will result in a reward:
-- *Moving* results in a **-1** reward, this will guide the agent towards more efficient path between objectives,
+- *Moving* results in a **-1** reward, this will guide the agent towards a more efficient path between objectives,
 - *picking up* or *dropping off* at a forbidden location results in a **-20** reward, this will guide the agent towards not *spamming* the *dropoff* and *pickup* actions,
-- *dropping off* the passenger at the correct location results in a **+20** reward, this will guide the agent towards completing the objective.
+- *dropping off* the passenger at the correct location results in a **+20** reward, this will guide the agent towards completing the objective and is the only positive reward available.
 
 # Algorithms
 
