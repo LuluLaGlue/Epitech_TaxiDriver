@@ -1,5 +1,7 @@
 import gym
+import time
 import torch
+import random
 import argparse
 import numpy as np
 from DQN import DQN, DQN_2
@@ -41,7 +43,8 @@ def play(model,
          render: bool = False,
          max_steps: int = 100,
          slow: bool = False,
-         silent: bool = False):
+         silent: bool = False,
+         is_loop: bool = False):
     # Play an episode
     actions_str = ["South", "North", "East", "West", "Pickup", "Dropoff"]
 
@@ -59,7 +62,7 @@ def play(model,
         state, reward, done, _ = env.step(action)
         total_reward += reward
         display.clear_output(wait=True)
-        if render:
+        if render or (random.uniform(0, 1) < 0.3 and not is_loop):
             env.render()
             print(
                 f"Iter: {iteration} - Action: {action}({actions_str[action]}) - Reward {reward}"
@@ -82,7 +85,7 @@ if __name__ == "__main__":
     parser.add_argument("-p",
                         "--path",
                         type=str,
-                        default="./models/reference/DQN_reference.pt",
+                        default="./models/reference_2/DQN_reference_2.pt",
                         help="DQN model to use")
     parser.add_argument(
         "-m",
@@ -121,11 +124,13 @@ if __name__ == "__main__":
     if slow:
         render = True
 
+    start = time.time()
     env = gym.make("Taxi-v3").env
     optimizer, model, device = import_model(path)
 
     mean_steps, mean_result = 0, 0
     total_failed = 0
+    is_loop = True if args.loop != 1 else False
 
     for l in range(loop):
         steps, result, done = play(model,
@@ -133,16 +138,18 @@ if __name__ == "__main__":
                                    slow=slow,
                                    env=env,
                                    max_steps=max,
-                                   device=device)
+                                   device=device,
+                                   is_loop=is_loop)
         mean_steps += steps
         mean_result += result
         if not done:
             total_failed += 1
 
-    if loop > 1:
+    if is_loop:
         print()
         print(
-            "[{} LOOP DONE - {}% FAILED] - Mean Steps Per Loop: {} - Mean Reward Per Loop: {}"
+            "[{} LOOP DONE - {}% FAILED - {} SECONDES] - Mean Steps Per Loop: {} - Mean Reward Per Loop: {}"
             .format(loop, np.round(total_failed / loop * 100, 2),
+                    np.round(time.time() - start, 4),
                     np.round(mean_steps / loop, 2),
                     np.round(mean_result / loop, 2)))

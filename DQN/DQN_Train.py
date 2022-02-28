@@ -100,8 +100,10 @@ class TrainingAgent():
             print("[WARNING] - Unable to Import Model")
             if input("Do you wish to create a new model ? [y/n] ").lower(
             ) == "y":
+                print("Creating model {}...".format(id))
                 self.compile()
             else:
+                print("Stopping Execution.")
                 sys.exit(0)
 
     def compile(self):

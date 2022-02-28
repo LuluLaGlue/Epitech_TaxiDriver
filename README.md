@@ -57,8 +57,9 @@ In order to train a model capable of accomplishing more complexe tasks we turned
     + <code>--name</code>: Name to give the resulting model. **Default**: Timestamp
     + <code>--model</code>: Path to a previously created model to further train (When resuming training, will take the previously set parameters)
     + <code>--episodes</code>: Number of episodes during training. **Default**: 10000
+    + <code>--architecture</code>: Architecture to use (1 or 2): **Default**: 1
     + <code>-h</code>: Display a help message.
-- ***DQN.py***: A python Class that contains our DQN model.
+- ***DQN.py***: A python Class that contains our DQN models (DQN and DQN_2).
 - ***models/***: This folder contains a few models trained using the ***DQN_Train.py*** with varying parameters.
 - ***DQN_Play.py***: A python script used to play the Taxi Game based on a previously trained model (***models/***). To run it, use <code>python DQN_Play.py</code> with the following possible arguments:
     + <code>-p</code>: Path to model to use. **Default**: <code>./models/reference/DQN_reference.pt</code>
