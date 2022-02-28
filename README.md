@@ -2,8 +2,18 @@
 
 This repository contains our attempt at Reinforcement Learning, the goal of this project is to train an AI capable of picking up a passanger in a random spot and driving him to another random spot on a map.
 
-## First Approach
-### Q Learning
+## Value Iteration Algorithm
+One of the first algorithm used for reinforcement learning was the *Value Iteration Algorithm*, its core idea is to calculate the value of each state. It loops over all states and possible actions to explore rewards of a given action and calculates the maximum possible action/reward and stores it in a table. This solution can be found in the *Value Iteration* directory with the following files:
+- ***VI_Train.py***: A python script used to train and save a new table (or model). To run it, use <code>python VI_Train.py</code> with the following possible arguments:
+    + <code>--gamma</code>: Gamma or Discount Rating. **Default**: 0.9
+    + <code>-h</code>: Display a help message.
+- ***v-iteration.npy***: The resulting table (or model) stored in a *numpy* file. It took 1.22 secondes to train the one present.
+- ***VI_Play.py***: A python script used to play the Taxi Game based on the priously trained model (***v-iteration.npy***). To run it use <code>python VI_Play.py</code> with the following possible arguments:
+    + <code>-s</code>: Activate Slow Mode.
+    + <code>-r</code>: Activate Render.
+    + <code>-l</code>: Set a number of times to play the game.
+    + <code>-h</code>: Display a help message.
+## Q Learning
 In order to train a model capable of completing the task at hand we decided to use the Q Learning algorithm. This attempt is located in the *Q-Learning* directory with the following files:
 - ***Q-Learning_Train.py***: A python script used to train and save a new model (or Q Table) to run it use <code>python Q-Learning_Train.py</code> with the following possible arguments:
     + <code>-l</code>: Learning Rate. **Default**: 0.99
@@ -20,7 +30,7 @@ In order to train a model capable of completing the task at hand we decided to u
     + <code>-l</code>: Set a number of times to play the game (equivalent to *episodes* during training)
     + <code>-h</code>: Display a help message.
 
-### SARSA
+## SARSA
 In order to shorten the training time we tried to implement the SARSA algorithm. This attempt is located in the *SARSA* directory with the following files:
 - ***SARSA_Train.py***: A python script used to train and save a new model (or Q Table), to run it use <code>python SARSA_Train.py</code> with the following possible arguments:
     + <code>-a</code>: Alpha. **Default**: 0.85
@@ -37,7 +47,7 @@ In order to shorten the training time we tried to implement the SARSA algorithm.
     + <code>-l</code>: Set a number of times to play the game (equivalent to *episodes* during training)
     + <code>-h</code>: Display a help message.
 
-### DQN
+## DQN
 In order to train a model capable of accomplishing more complexe tasks we turned to Deep Q Learning. This attempt is located in the *DQN* directory with the following files:
 - ***DQN_Train.py***: A python script used to train and save a new model. To run it use <code>python DQN_Train.py</code> with the following possible arguments:
     + <code>--environment</code>.Environment in which to train the model. **Default**: Taxi-v3
