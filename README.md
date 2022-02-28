@@ -1,10 +1,10 @@
 # Taxi Driver
+<div style="text-align: justify"> 
+&emsp;This repository contains our attempt at Reinforcement Learning, the goal of this project is to train an AI capable of picking up a passanger in a random spot and driving him to another random spot on a map. To do so we worked with *OpenAI*'s *gym*'s *Taxi* environment.
 
-This repository contains our attempt at Reinforcement Learning, the goal of this project is to train an AI capable of picking up a passanger in a random spot and driving him to another random spot on a map. To do so we worked with *OpenAI*'s *gym*'s *Taxi* environment.
+&emsp;In this environment there are 4 different locations indicated by *R(ed)*, *B(lue)*, *Y(ellow)*, *G(reen)*. At the start of an episode, the taxi starts off at a random square and the passenger is at a random location (*R*, *B*, *Y* or *G*). The taxi must drive to the passenger's location, pick him up, drive him to his destination (another random location) and drop him off. Once the passenger is dropped off the episode ends. The Taxi can not go through walls.
 
-In this environment there are 4 different locations indicated by *R(ed)*, *B(lue)*, *Y(ellow)*, *G(reen)*. At the start of an episode, the taxi starts off at a random square and the passenger is at a random location (*R*, *B*, *Y* or *G*). The taxi must drive to the passenger's location, pick him up, drive him to his destination (another random location) and drop him off. Once the passenger is dropped off the episode ends. The Taxi can not go through walls.
-
-There are *6* possible actions:
+&emsp;There are *6* possible actions:
 - *0*: Go *South* (or *down*),
 - *1*: Go *North* (or *up*),
 - *2*: Go *East* (or *right*),
@@ -12,7 +12,7 @@ There are *6* possible actions:
 - *4*: *Pickup* the passenger,
 - *5*: *Dropoff* the passenger.
 
-Each action taken by the agent will result in a reward:
+&emsp;Each action taken by the agent will result in a reward:
 - *Moving* results in a **-1** reward, this will guide the agent towards a more efficient path between objectives,
 - *picking up* or *dropping off* at a forbidden location results in a **-20** reward, this will guide the agent towards not *spamming* the *dropoff* and *pickup* actions,
 - *dropping off* the passenger at the correct location results in a **+20** reward, this will guide the agent towards completing the objective and is the only positive reward available.
@@ -20,7 +20,7 @@ Each action taken by the agent will result in a reward:
 # Algorithms
 
 ## Value Iteration Algorithm
-One of the first algorithm used for reinforcement learning was the *Value Iteration Algorithm*, its core idea is to calculate the value of each state. It loops over all states and possible actions to explore rewards of a given action and calculates the maximum possible action/reward and stores it in a table. This solution can be found in the *Value Iteration* directory with the following files:
+&emsp;One of the first algorithm used for reinforcement learning was the *Value Iteration Algorithm*, its core idea is to calculate the value of each state. It loops over all states and possible actions to explore rewards of a given action and calculates the maximum possible action/reward and stores it in a table. This solution can be found in the *Value Iteration* directory with the following files:
 - ***VI_Train.py***: A python script used to train and save a new table (or model). To run it, use <code>python VI_Train.py</code> with the following possible arguments:
     + <code>--gamma</code>: Gamma or Discount Rating. **Default**: 0.9
     + <code>-h</code>: Display a help message.
@@ -31,14 +31,14 @@ One of the first algorithm used for reinforcement learning was the *Value Iterat
     + <code>-l</code>: Set a number of times to play the game.
     + <code>-h</code>: Display a help message.
 
-Per its trainig logic this approach is is model based as we have to know all environment states/transitions upfront so the algorithm works.
+&emsp;Per its trainig logic this approach is is model based as we have to know all environment states/transitions upfront so the algorithm works.
 
 ## Q Learning
-In order to train a model capable of completing the task at hand without being model based we decided to use the Q Learning algorithm. This algorithm is centred around the actor (the Taxi in our case) and starts exploring on trial-and-error to update its knowledge about the model (= path to the best reward). During training, this algorithm will update a matrice containing the maximum discounted future reward for each action and state. It is based on the Bellman equation extended with a learning rate (we set it by default to *0.01* with gamma at *0.99*):
+&emsp;In order to train a model capable of completing the task at hand without being model based we decided to use the Q Learning algorithm. This algorithm is centred around the actor (the Taxi in our case) and starts exploring on trial-and-error to update its knowledge about the model (= path to the best reward). During training, this algorithm will update a matrice containing the maximum discounted future reward for each action and state. It is based on the Bellman equation extended with a learning rate (we set it by default to *0.01* with gamma at *0.99*):
 
 <code>New Q(S, A) = Q(S, A) + alpha * (R(S, A) + gamma * MaxQ'(S', A') - Q(S, A))</code>.
 
-This attempt is located in the *Q-Learning* directory with the following files:
+&emsp;This attempt is located in the *Q-Learning* directory with the following files:
 - ***Q-Learning_Train.py***: A python script used to train and save a new model (or Q-Matrix) to run it use <code>python Q-Learning_Train.py</code> with the following possible arguments:
     + <code>-l</code>: Learning Rate. **Default**: 0.01
     + <code>-g</code>: Gamma or Discount Rating. **Default**: 0.99
@@ -54,10 +54,10 @@ This attempt is located in the *Q-Learning* directory with the following files:
     + <code>-l</code>: Set a number of times to play the game (equivalent to *episodes* during training)
     + <code>-h</code>: Display a help message.
 
-This approach is effective in our case as the only positive reward is the correct dropoff of the passenger. If the environment were to contain another positive reward the trial-and-error approach might optimize the route to it and miss out on the real goal of the game it is learning to play. In order to to limit this we implemented the Epsilon Decreasing method which consists of exploiting the current situation with probability <code>1 - epsilon</code> and exploring a new option with probability <code>epsilon</code> with epsilon decreasing over time. The Epsilon Decreasing method is particularly effective in environment such as Frozen Lakes where the game actions are not deterministic.
+&emsp;This approach is effective in our case as the only positive reward is the correct dropoff of the passenger. If the environment were to contain another positive reward the trial-and-error approach might optimize the route to it and miss out on the real goal of the game it is learning to play. In order to to limit this we implemented the Epsilon Decreasing method which consists of exploiting the current situation with probability <code>1 - epsilon</code> and exploring a new option with probability <code>epsilon</code> with epsilon decreasing over time. The Epsilon Decreasing method is particularly effective in environment such as Frozen Lakes where the game actions are not deterministic.
 
 ## SARSA
-In order to shorten the training time and explore other possible algorithm we tried to implement the SARSA algorithm. This attempt is located in the *SARSA* directory with the following files:
+&emsp;In order to shorten the training time and explore other possible algorithm we tried to implement the SARSA algorithm. This attempt is located in the *SARSA* directory with the following files:
 - ***SARSA_Train.py***: A python script used to train and save a new model (or Q-Matrix), to run it use <code>python SARSA_Train.py</code> with the following possible arguments:
     + <code>-a</code>: Alpha. **Default**: 0.85
     + <code>-g</code>: Gamma or Discount Rating. **Default**: 0.99 (We first tried with *0.95* but the resulting model was not effective enough)
@@ -74,7 +74,7 @@ In order to shorten the training time and explore other possible algorithm we tr
     + <code>-h</code>: Display a help message.
 
 ## DQN
-In order to train a model capable of accomplishing more complexe tasks we turned to Deep Q Learning. Indeed, the algorithm showcased before are perfect for small environment such as the Taxi driver or Frozen Lake but in more complexe environment with a lot more observation space (an Atari Video Game for exemple) they will quickly be unmanageable. Furthermore, the Q-Agent has no ability to estimate value for an unseen state, it will go back at best to to random actions. To deal with this problem *Deep Q Learning* algorithm remove the two dimensional Q-Matrix and replace it with a Neural Network. This attempt is located in the *DQN* directory with the following files:
+&emsp;In order to train a model capable of accomplishing more complexe tasks we turned to Deep Q Learning. Indeed, the algorithm showcased before are perfect for small environment such as the Taxi driver or Frozen Lake but in more complexe environment with a lot more observation space (an Atari Video Game for exemple) they will quickly be unmanageable. Furthermore, the Q-Agent has no ability to estimate value for an unseen state, it will go back at best to to random actions. To deal with this problem *Deep Q Learning* algorithm remove the two dimensional Q-Matrix and replace it with a Neural Network. This attempt is located in the *DQN* directory with the following files:
 - ***DQN_Train.py***: A python script used to train and save a new model. To run it use <code>python DQN_Train.py</code> with the following possible arguments:
     + <code>--environment</code>.Environment in which to train the model. **Default**: Taxi-v3
     + <code>--batch_size</code>. Batch Size during training. **Default**: 128
@@ -106,11 +106,12 @@ In order to train a model capable of accomplishing more complexe tasks we turned
 
 # Conclusions
 
-For every algorithm/approach we tried, we manage to setup a fonctionnal agent capable of effectively completing the game.
+&emsp;For every algorithm/approach we tried, we manage to setup a fonctionnal agent capable of effectively completing the game.
 - We started with the Value Iteration algorithm which took *48.96* secondes to solve the game *10 000* times with an average *14.06* steps and *7.94* reward per episode and a *100%* win rate.
 - We then used the *Q-Learning* algorithm based on a Q-Matrix and trained it with several parameters (we settled with <code>gamma = 0.99</code>, <code>Learning Rate = 0.01</code>, <code>minimal epsilon = 0.001</code> and <code>Decay Rate = 0.01</code>), the resulting model takes *50.32* secondes to solve the game *10 000* times with an average *15.35* steps and *6.33* reward per episode and a *98.48%* win rate.
 - In order to improve those metrics we used the *SARSA* algorithm and tuned it in the same way as the *Q-Learning* one (we settled with <code>alpha = 0.85</code>, <code>gamma = 0.99</code>, <code>minimal epsilon = 0.001</code> and <code>Decay Rate = 0.01</code>) we managed to solve the game *10 000* times in *49.43* secondes with an average *16.18* steps and *-7.13* reward per episode and a *98.56%* win rate.
 - Finally, we trained 2 *Deep Q Learning* algorithm based on 2 different architectures, after fine tuning the parameters we settled with <code>batch_size = 128</code>, <code>gamma = 0.99</code>, <code>minimal epsilon = 0.1</code>, <code>epsilon decay = 400</code>, <code>number of episodes betzeen each model update = 20</code>, <code>max number of steps per episode = 100</code>, <code>save frequency = 1000</code>, <code>learning rate = 0.001</code>, <code>minimal learning rate = 0.0001</code>, <code>learning rate decay = 5000</code>, <code>memory size = 50000</code>, <code>architecture = 2</code>. With the best architecture and parameters we trained we achieved *10 000* games in *17.82* secondes with an average *13.10* steps and *7.90* reward per episode and a *100%* win rate.
 
-With the resulting metrics in mind we can clearly conclude that a classic Machine Learning approach (Q-Learning, SARSA, etc.) is working in a small environment such as the Frozen Lake but in a more complexe environment *Deep Learning* is required to attain a sufficient win rate in a limited time. The environment in which we trained our models (Taxi-v3) is at the limit between small enough to use *Machine Learning* and big enough to benefit from *Deep Learning*, we clearly outlined the limitations of *Machine Learning* with bellow *99%* winrate in both *Q-Learning* and *SARSA* but still managed to solve the game in acceptable times. 
-On a side note, even though *Value Iteration* obtained a *100%* winrate it took almost *50* secondes to clear the *10 000* loops which, compared to the *18* secondes of *DQN* is way to high.
+&emsp;With the resulting metrics in mind we can clearly conclude that a classic *Machine Learning* approach (Q-Learning, SARSA, etc.) is working in a small environment such as the Frozen Lake but in a more complexe environment *Deep Learning* is required to attain a sufficient win rate in a limited time. The environment in which we trained our models (Taxi-v3) is at the limit between small enough to use *Machine Learning* and big enough to benefit from *Deep Learning*, we clearly outlined the limitations of *Machine Learning* with bellow *99%* winrate in both *Q-Learning* and *SARSA* but still managed to solve the game in acceptable times, *Deep Learning* shined with both perfect win rate (*100%*) and short execution times (*17.82* secondes for *10 000* loops).
+
+&emsp;On a side note, even though *Value Iteration* obtained a *100%* winrate it took almost *50* secondes to clear the *10 000* loops which, compared to the *18* secondes of *DQN* is way to high.</div>
