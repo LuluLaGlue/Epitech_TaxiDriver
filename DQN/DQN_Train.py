@@ -3,6 +3,7 @@ import sys
 import gym
 import time
 import argparse
+import matplotlib
 import numpy as np
 import pandas as pd
 from DQN_Play import play
@@ -14,6 +15,11 @@ from Memory import Transition, ReplayMemory
 import torch
 import torch.optim as optim
 import torch.nn.functional as F
+
+is_notebook = 'inline' in matplotlib.get_backend()
+
+if is_notebook:
+    from IPython import display
 
 
 class TrainingAgent():
@@ -35,7 +41,8 @@ class TrainingAgent():
                  memory_size=50000,
                  num_episodes=10000,
                  name=None,
-                 architecture=2):
+                 architecture=2,
+                 save=True):
         self.config = {
             "BATCH_SIZE": batch_size,
             "GAMMA": gamma,
@@ -53,6 +60,7 @@ class TrainingAgent():
             "NUM_EPISODES": num_episodes,
             "SHOULD_WARMUP": True
         }
+        self.save_fig = save
         self.episode_durations = []
         self.reward_in_episode = []
         self.epsilon_vec = []
@@ -70,9 +78,9 @@ class TrainingAgent():
             n_actions = self.env.action_space.n
             n_observations = self.env.observation_space.n
             self.id = id
-            self.architecture = checkpoint.get("architecture") or 1
-
             checkpoint = torch.load(f"./models/{id}/DQN_{id}.pt")
+
+            self.architecture = checkpoint.get("architecture") or 1
 
             self.model = DQN(n_observations, n_actions).to(
                 self.device) if self.architecture == 1 else DQN_2(
@@ -97,7 +105,7 @@ class TrainingAgent():
             if len(self.episode_durations) - 1 > self.config["WARMUP_EPISODE"]:
                 self.config["SHOULD_WARMUP"] = False
         except:
-            print("[WARNING] - Unable to Import Model")
+            print("[WARNING] - Unable to Import Model {}".format(id))
             if input("Do you wish to create a new model ? [y/n] ").lower(
             ) == "y":
                 print("Creating model {}...".format(id))
@@ -288,20 +296,21 @@ class TrainingAgent():
         return np.hstack([x[:periods - 1], res])
 
     def save(self):
-        if not os.path.isdir(f"./models/{self.id}"):
-            os.makedirs(f"./models/{self.id}")
+        if self.save_fig:
+            if not os.path.isdir(f"./models/{self.id}"):
+                os.makedirs(f"./models/{self.id}")
 
-        torch.save(
-            {
-                'model_state_dict': self.model.state_dict(),
-                'optimizer_state_dict': self.optimizer.state_dict(),
-                "reward_in_episode": self.reward_in_episode,
-                "episode_durations": self.episode_durations,
-                "epsilon_vec": self.epsilon_vec,
-                "config": self.config,
-                "architecture": self.architecture
-            }, f"./models/{self.id}/DQN_{self.id}.pt")
-        plt.savefig(f"./models/{self.id}/DQN_{self.id}_graph.png")
+            torch.save(
+                {
+                    'model_state_dict': self.model.state_dict(),
+                    'optimizer_state_dict': self.optimizer.state_dict(),
+                    "reward_in_episode": self.reward_in_episode,
+                    "episode_durations": self.episode_durations,
+                    "epsilon_vec": self.epsilon_vec,
+                    "config": self.config,
+                    "architecture": self.architecture
+                }, f"./models/{self.id}/DQN_{self.id}.pt")
+            plt.savefig(f"./models/{self.id}/DQN_{self.id}_graph.png")
 
     def plot_durations(self):
         lines = []
@@ -328,7 +337,10 @@ class TrainingAgent():
         labs = [l.get_label() for l in lines]
         ax1.legend(lines, labs, loc=3)
 
-        plt.show()
+        if is_notebook:
+            display.clear_output(wait=True)
+        else:
+            plt.show()
         plt.pause(0.001)
 
 
@@ -463,7 +475,7 @@ if __name__ == "__main__":
 
     mean_steps, mean_result, total_failed = 0, 0, 0
     for l in range(1000):
-        steps, result, done = play(agent.model, silent=True)
+        steps, result, done = play(agent.model, is_loop=True)
         mean_steps += steps
         mean_result += result
         if not done:
@@ -475,22 +487,27 @@ if __name__ == "__main__":
     print("Saving Metrics to models.csv...")
     df = pd.read_csv("models.csv", sep=";")
 
-    new_row = [[
-        f"{agent.id}/DQN_{agent.id}.pt", agent.config["BATCH_SIZE"],
-        agent.config["GAMMA"], agent.config["EPS_START"],
-        agent.config["EPS_END"], agent.config["EPS_DECAY"],
-        agent.config["TARGET_UPDATE"], agent.config["MAX_STEPS_PER_EPISODE"],
-        agent.config["WARMUP_EPISODE"], agent.config["SAVE_FREQ"],
-        agent.config["LR"], agent.config["LR_MIN"], agent.config["LR_DECAY"],
-        agent.config["MEMORY_SIZE"], agent.config["NUM_EPISODES"],
-        np.round(np.mean(agent.reward_in_episode[-100:]),
-                 2), percentage_success
-    ]]
-    df2 = pd.DataFrame(new_row, columns=df.columns.values)
-    new_df = pd.concat([df, df2])
-    new_df.set_index('name', drop=True, inplace=True)
+    if not f"{agent.id}/DQN_{agent.id}.pt" in df["name"].unique():
+        new_row = [[
+            f"{agent.id}/DQN_{agent.id}.pt", agent.config["BATCH_SIZE"],
+            agent.config["GAMMA"], agent.config["EPS_START"],
+            agent.config["EPS_END"], agent.config["EPS_DECAY"],
+            agent.config["TARGET_UPDATE"],
+            agent.config["MAX_STEPS_PER_EPISODE"],
+            agent.config["WARMUP_EPISODE"], agent.config["SAVE_FREQ"],
+            agent.config["LR"], agent.config["LR_MIN"],
+            agent.config["LR_DECAY"], agent.config["MEMORY_SIZE"],
+            agent.config["NUM_EPISODES"],
+            np.round(np.mean(agent.reward_in_episode[-100:]),
+                     2), percentage_success
+        ]]
+        df2 = pd.DataFrame(new_row, columns=df.columns.values)
+        new_df = pd.concat([df, df2])
+        new_df.set_index('name', drop=True, inplace=True)
 
-    new_df.to_csv("models.csv", sep=";")
-    print("Metrics Saved.")
+        new_df.to_csv("models.csv", sep=";")
+        print("Metrics Saved.")
+    else:
+        print("Model already saved not saving metrics")
 
     plt.ioff()

@@ -1,5 +1,4 @@
 # Taxi Driver
-<div style="text-align: justify"> 
 &emsp;This repository contains our attempt at Reinforcement Learning, the goal of this project is to train an AI capable of picking up a passanger in a random spot and driving him to another random spot on a map. To do so we worked with *OpenAI*'s *gym*'s *Taxi* environment.
 
 &emsp;In this environment there are 4 different locations indicated by *R(ed)*, *B(lue)*, *Y(ellow)*, *G(reen)*. At the start of an episode, the taxi starts off at a random square and the passenger is at a random location (*R*, *B*, *Y* or *G*). The taxi must drive to the passenger's location, pick him up, drive him to his destination (another random location) and drop him off. Once the passenger is dropped off the episode ends. The Taxi can not go through walls.
@@ -103,6 +102,8 @@
     + <code>-r</code>: Activate Render.
     + <code>-l</code>: Set a number of times to play the game (equivalent to *episodes* during training). **Default**: 1
     + <code>-h</code>: Display a help message.
+- ***DQN.ipynb***: A jupyter notebook demonstrating the process to train a new model as well as the different parameters we applied to train different models with different parameters.
+- ***models.csv***: Since trained several models to compare how each parameter influenced performances we saved each model's parameters along with its win rate in this *.csv* file.
 
 # Conclusions
 
@@ -114,4 +115,4 @@
 
 &emsp;With the resulting metrics in mind we can clearly conclude that a classic *Machine Learning* approach (Q-Learning, SARSA, etc.) is working in a small environment such as the Frozen Lake but in a more complexe environment *Deep Learning* is required to attain a sufficient win rate in a limited time. The environment in which we trained our models (Taxi-v3) is at the limit between small enough to use *Machine Learning* and big enough to benefit from *Deep Learning*, we clearly outlined the limitations of *Machine Learning* with bellow *99%* winrate in both *Q-Learning* and *SARSA* but still managed to solve the game in acceptable times, *Deep Learning* shined with both perfect win rate (*100%*) and short execution times (*17.82* secondes for *10 000* loops).
 
-&emsp;On a side note, even though *Value Iteration* obtained a *100%* winrate it took almost *50* secondes to clear the *10 000* loops which, compared to the *18* secondes of *DQN* is way to high.</div>
+&emsp;On a side note, even though *Value Iteration* obtained a *100%* winrate it took almost *50* secondes to clear the *10 000* loops which, compared to the *18* secondes of *DQN* is way to high.
