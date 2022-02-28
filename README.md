@@ -19,9 +19,9 @@ One of the first algorithm used for reinforcement learning was the *Value Iterat
 Per its trainig logic this approach is is model based as we have to know all environment states/transitions upfront so the algorithm works.
 
 ## Q Learning
-In order to train a model capable of completing the task at hand without being model based we decided to use the Q Learning algorithm. This algorithm is centred around the actor (the Taxi in our case) and starts exploring on trial-and-error to update its knowledge about the model (= path to the best reward). During training, this algorithm will update a matrice containing the maximum discounted future reward for each action and state. It is based on the Bellman equation extended with a learning rate (we set it by default to *0.01*):
+In order to train a model capable of completing the task at hand without being model based we decided to use the Q Learning algorithm. This algorithm is centred around the actor (the Taxi in our case) and starts exploring on trial-and-error to update its knowledge about the model (= path to the best reward). During training, this algorithm will update a matrice containing the maximum discounted future reward for each action and state. It is based on the Bellman equation extended with a learning rate (we set it by default to *0.01* with gamma at *0.99*):
 
-<code>New Q(S, A) = Q(S, A) + \alpha [R(S, A) + \gamma max(Q'(S', A')) - Q(S, A)]</code>.
+<code>New Q(S, A) = Q(S, A) + alpha * (R(S, A) + gamma * MaxQ'(S', A') - Q(S, A))</code>.
 
 This attempt is located in the *Q-Learning* directory with the following files:
 - ***Q-Learning_Train.py***: A python script used to train and save a new model (or Q Table) to run it use <code>python Q-Learning_Train.py</code> with the following possible arguments:
