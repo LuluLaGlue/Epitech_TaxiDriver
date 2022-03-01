@@ -1,10 +1,50 @@
+import matplotlib.pyplot as plt
 from datetime import datetime
 import numpy as np
 import argparse
 import time
 import gym
 
-env = gym.make("Taxi-v3")
+
+def moving_average(x, periods=5):
+    if len(x) < periods:
+
+        return x
+
+    cumsum = np.cumsum(np.insert(x, 0, 0))
+    res = (cumsum[periods:] - cumsum[:-periods]) / periods
+
+    return np.hstack([x[:periods - 1], res])
+
+
+def plot_durations(episode_durations,
+                   reward_in_episode,
+                   epsilon_vec,
+                   max_steps_per_episode=100):
+    '''Plot graphs containing Epsilon, Rewards, and Steps per episode over time'''
+    lines = []
+    fig = plt.figure(1, figsize=(15, 7))
+    plt.clf()
+    ax1 = fig.add_subplot(111)
+
+    plt.title(f'Training...')
+    ax1.set_xlabel('Episode')
+    ax1.set_ylabel('Duration & Rewards')
+    ax1.set_ylim(-2 * max_steps_per_episode, max_steps_per_episode + 10)
+    ax1.plot(episode_durations, color="C1", alpha=0.2)
+    ax1.plot(reward_in_episode, color="C2", alpha=0.2)
+    mean_steps = moving_average(episode_durations, periods=5)
+    mean_reward = moving_average(reward_in_episode, periods=5)
+    lines.append(ax1.plot(mean_steps, label="steps", color="C1")[0])
+    lines.append(ax1.plot(mean_reward, label="rewards", color="C2")[0])
+
+    ax2 = ax1.twinx()
+    ax2.set_ylabel('Epsilon')
+    lines.append(ax2.plot(epsilon_vec, label="epsilon", color="C3")[0])
+    labs = [l.get_label() for l in lines]
+    ax1.legend(lines, labs, loc=3)
+
+    plt.pause(0.001)
 
 
 def train(episodes=2000,
@@ -18,6 +58,7 @@ def train(episodes=2000,
     start_time = time.time()
     total_reward = []
     steps_per_episode = []
+    epsilon_vec = []
 
     Q = np.zeros((env.observation_space.n, env.action_space.n))
 
@@ -34,6 +75,7 @@ def train(episodes=2000,
 
         epsilon = min_epsilon + (max_epsilon - min_epsilon) * np.exp(
             -epsilon_decay * e)
+        epsilon_vec.append(epsilon)
 
         if np.random.uniform(0, 1) < epsilon:
             action1 = env.action_space.sample()
@@ -69,6 +111,10 @@ def train(episodes=2000,
 
     end_date = datetime.now()
     execution_time = (time.time() - start_time)
+    plot_durations(steps_per_episode,
+                   total_reward,
+                   epsilon_vec,
+                   max_steps_per_episode=200)
 
     print()
     print("{} - Training Ended".format(end_date))
@@ -78,6 +124,7 @@ def train(episodes=2000,
         np.round(execution_time / 3600, 2)))
 
     np.save("q-table", Q)
+    plt.savefig("SARSA_graph.png")
 
     return np.round(execution_time, 2), np.mean(total_reward)
 
@@ -88,7 +135,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--episodes",
         type=int,
-        default=2000,
+        default=10000,
         help="Number of episodes",
     )
     parser.add_argument("-a",
@@ -125,6 +172,8 @@ if __name__ == "__main__":
     min_epsilon = args.min_epsilon
     epsilon_decay = args.decay_rate
     alpha = args.alpha
+
+    env = gym.make("Taxi-v3")
 
     train(episodes, gamma, epsilon, max_epsilon, min_epsilon, epsilon_decay,
           alpha)

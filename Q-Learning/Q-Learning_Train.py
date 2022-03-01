@@ -1,9 +1,61 @@
+import matplotlib.pyplot as plt
 from datetime import datetime
 import numpy as np
+import matplotlib
 import argparse
 import random
 import time
 import gym
+
+is_notebook = 'inline' in matplotlib.get_backend()
+
+if is_notebook:
+    from IPython import display
+
+
+def moving_average(x, periods=5):
+    if len(x) < periods:
+
+        return x
+
+    cumsum = np.cumsum(np.insert(x, 0, 0))
+    res = (cumsum[periods:] - cumsum[:-periods]) / periods
+
+    return np.hstack([x[:periods - 1], res])
+
+
+def plot_durations(episode_durations,
+                   reward_in_episode,
+                   epsilon_vec,
+                   max_steps_per_episode=100):
+    '''Plot graphs containing Epsilon, Rewards, and Steps per episode over time'''
+    lines = []
+    fig = plt.figure(1, figsize=(15, 7))
+    plt.clf()
+    ax1 = fig.add_subplot(111)
+
+    plt.title(f'Training...')
+    ax1.set_xlabel('Episode')
+    ax1.set_ylabel('Duration & Rewards')
+    ax1.set_ylim(-2 * max_steps_per_episode, max_steps_per_episode + 10)
+    ax1.plot(episode_durations, color="C1", alpha=0.2)
+    ax1.plot(reward_in_episode, color="C2", alpha=0.2)
+    mean_steps = moving_average(episode_durations, periods=5)
+    mean_reward = moving_average(reward_in_episode, periods=5)
+    lines.append(ax1.plot(mean_steps, label="steps", color="C1")[0])
+    lines.append(ax1.plot(mean_reward, label="rewards", color="C2")[0])
+
+    ax2 = ax1.twinx()
+    ax2.set_ylabel('Epsilon')
+    lines.append(ax2.plot(epsilon_vec, label="epsilon", color="C3")[0])
+    labs = [l.get_label() for l in lines]
+    ax1.legend(lines, labs, loc=3)
+
+    if is_notebook:
+        display.clear_output(wait=True)
+    else:
+        plt.show()
+    plt.pause(0.001)
 
 
 def train(episodes=25000,
@@ -17,6 +69,7 @@ def train(episodes=25000,
 
     total_reward = []
     steps_per_episode = []
+    epsilon_vec = []
 
     print("{} - Starting Training...\n".format(start_date))
     for e in range(episodes):
@@ -28,6 +81,7 @@ def train(episodes=25000,
         steps_per_episode.append(0)
         epsilon = min_epsilon + (max_epsilon - min_epsilon) * np.exp(
             -epsilon_decay * e)
+        epsilon_vec.append(epsilon)
 
         # Loop as long as the game is not over, i.e. done is not True
         while not done:
@@ -59,6 +113,10 @@ def train(episodes=25000,
                         np.mean(total_reward[-int(episodes / 100):]),
                         np.mean(steps_per_episode[-int(episodes / 100):])))
 
+    plot_durations(steps_per_episode,
+                   total_reward,
+                   epsilon_vec,
+                   max_steps_per_episode=200)
     end_date = datetime.now()
     execution_time = (time.time() - start_time)
 
@@ -70,6 +128,8 @@ def train(episodes=25000,
         np.round(execution_time / 3600, 2)))
     # print("Q Table: \n", q_table)
     np.save("q-table", q_table)
+    plt.show()
+    plt.savefig("Q-Learning_graph.png")
 
     return np.round(execution_time, 2), np.mean(total_reward)
 
@@ -110,6 +170,8 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
+    plt.ion()
+
     epsilon = args.epsilon
     max_epsilon = args.epsilon
     episodes = args.episodes
@@ -125,3 +187,4 @@ if __name__ == "__main__":
 
     time, reward = train(episodes, lr, gamma, epsilon, max_epsilon,
                          min_epsilon, epsilon_decay)
+    plt.ioff()
