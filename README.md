@@ -65,7 +65,7 @@
     + <code>--min_epsilon</code>: Minimal value for exploration rate. **Default**: 0.001
     + <code>-d</code>: Decay Rate. **Default**: 0.01
     + <code>-h</code>: Display a help message.
-- ***q-table.npy***: The resulting model (or Q-Matrix) stored in a *numpy* file. We observed that the *25 000* episodes used with ***Q Learning*** were no longer need and that the model could be trained with roughly *2 000* episodes, doing so took only 1.22s of training.
+- ***q-table.npy***: The resulting model (or Q-Matrix) stored in a *numpy* file. We observed that the *25 000* episodes used with ***Q Learning*** were no longer needed and that the model could be trained with roughly *10 000* episodes, doing so took only *3.2* secondes of training.
 - ***SARSA_Play.py***: A python script used to play the Taxi Game based on the previously trained model (***q-table.npy***) to run it use <code>python SARSA_Play.py</code> with the following possible arguments:
     + <code>-s</code>: Activate Slow Mode.
     + <code>-r</code>: Activate Render.
