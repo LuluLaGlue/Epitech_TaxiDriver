@@ -102,7 +102,7 @@
     + <code>-r</code>: Activate Render.
     + <code>-l</code>: Set a number of times to play the game (equivalent to *episodes* during training). **Default**: 1
     + <code>-h</code>: Display a help message.
-- ***DQN.ipynb***: A jupyter notebook demonstrating the process to train a new model as well as the different parameters we applied to train different models with different parameters.
+- ***DQN.ipynb***: A jupyter notebook demonstrating the process to train a new model as well as the different parameters we applied to train different models with different parameters and there impact on training graphs (*epsilon*, *steps* and *reward* per episode).
 - ***models.csv***: Since trained several models to compare how each parameter influenced performances we saved each model's parameters along with its win rate in this *.csv* file.
 
 # Conclusions
