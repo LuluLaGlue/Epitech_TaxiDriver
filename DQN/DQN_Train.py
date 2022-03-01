@@ -72,8 +72,28 @@ class TrainingAgent():
         self.rng = np.random.default_rng(123)
         self.architecture = architecture
 
+    def print_model_info(self):
+        '''Display agent's configuration'''
+        print("Model Initialized with params:")
+        print(" - EPISODES: {},".format(self.config["NUM_EPISODES"]))
+        print(" - BATCH SIZE: {},".format(self.config["BATCH_SIZE"]))
+        print(" - GAMMA: {},".format(self.config["GAMMA"]))
+        print(" - STARTING EPSILON: {},".format(self.config["EPS_START"]))
+        print(" - ENDING EPSILON: {},".format(self.config["EPS_END"]))
+        print(" - DECAY EPSILON: {},".format(self.config["EPS_DECAY"]))
+        print(" - TARGET UPDATE: {},".format(self.config["TARGET_UPDATE"]))
+        print(" - MAX STEPS PER EPISODE: {},".format(
+            self.config["MAX_STEPS_PER_EPISODE"]))
+        print(" - WARMUP: {},".format(self.config["WARMUP_EPISODE"]))
+        print(" - SAVE FREQUENCIE: {},".format(self.config["SAVE_FREQ"]))
+        print(" - STARTING LEARNING RATE: {},".format(self.config["LR"]))
+        print(" - ENDING LEARNING RATE {},".format(self.config["LR_MIN"]))
+        print(" - DECAY LEARNING RATE: {},".format(self.config["LR_DECAY"]))
+        print(" - MEMORY: {}.".format(self.config["MEMORY_SIZE"]))
+        print()
+
     def import_model(self, id):
-        '''Need to rework config so that it does not restart entirely'''
+        '''Import an existing agent to finish training'''
         try:
             n_actions = self.env.action_space.n
             n_observations = self.env.observation_space.n
@@ -115,6 +135,7 @@ class TrainingAgent():
                 sys.exit(0)
 
     def compile(self):
+        '''Compile Agent based on selected architecture'''
         n_actions = self.env.action_space.n
         n_observations = self.env.observation_space.n
 
@@ -130,6 +151,7 @@ class TrainingAgent():
                                     lr=self.config["LR"])
 
     def _get_epsilon(self, episode):
+        '''Calculate Epsilon value depending on the number of episode'''
         epsilon = self.config["EPS_END"] + \
                           (self.config["EPS_START"] - self.config["EPS_END"]) * \
                               np.exp(-episode / self.config["EPS_DECAY"])
@@ -137,16 +159,15 @@ class TrainingAgent():
         return epsilon
 
     def _get_action_for_state(self, state):
+        '''Returns an action choosen by the agent based on a state'''
         with torch.no_grad():
-            # t.max(1) will return largest column value of each row.
-            # second column on max result is index of where max element was
-            # found, so we pick action with the larger expected reward.
             predicted = self.model(torch.tensor([state], device=self.device))
             action = predicted.max(1)[1]
 
         return action.item()
 
     def _choose_action(self, state, epsilon):
+        '''Defines whether to choose an action or explore'''
         if self.rng.uniform() < epsilon:
             action = self.env.action_space.sample()
         else:
@@ -155,6 +176,7 @@ class TrainingAgent():
         return action
 
     def _remember(self, state, action, next_state, reward, done):
+        '''Store state, action, next_state, reward, and status in memory'''
         self.memory.push(
             torch.tensor([state], device=self.device),
             torch.tensor([action], device=self.device, dtype=torch.long),
@@ -163,6 +185,7 @@ class TrainingAgent():
             torch.tensor([done], device=self.device, dtype=torch.bool))
 
     def _train_model(self):
+        '''Update Target Model's weight based on training model'''
         if len(self.memory) < self.config["BATCH_SIZE"]:
 
             return
@@ -195,6 +218,7 @@ class TrainingAgent():
         self.optimizer.step()
 
     def _adjust_learning_rate(self, episode):
+        '''Update Learning Rate based on number of episode'''
         delta = self.config["LR"] - self.config["LR_MIN"]
         base = self.config["LR_MIN"]
         rate = self.config["LR_DECAY"]
@@ -203,9 +227,11 @@ class TrainingAgent():
             param_group['lr'] = lr
 
     def _update_target(self):
+        '''Save Target Model's dictionary'''
         self.target_model.load_state_dict(self.model.state_dict())
 
     def fit(self):
+        '''Fit Agent during a number of episode'''
         self.memory = ReplayMemory(self.config["MEMORY_SIZE"])
         self.loss = F.smooth_l1_loss
 
@@ -296,6 +322,7 @@ class TrainingAgent():
         return np.hstack([x[:periods - 1], res])
 
     def save(self):
+        '''Save Model and graphs'''
         if self.save_fig:
             if not os.path.isdir(f"./models/{self.id}"):
                 os.makedirs(f"./models/{self.id}")
@@ -313,6 +340,7 @@ class TrainingAgent():
             plt.savefig(f"./models/{self.id}/DQN_{self.id}_graph.png")
 
     def plot_durations(self):
+        '''Plot graphs containing Epsilon, Rewards, and Steps per episode over time'''
         lines = []
         fig = plt.figure(1, figsize=(15, 7))
         plt.clf()
@@ -463,6 +491,8 @@ if __name__ == "__main__":
     else:
         agent.compile()
 
+    agent.print_model_info()
+
     agent.fit()
 
     time_train = time.time() - start_time
@@ -482,7 +512,7 @@ if __name__ == "__main__":
             total_failed += 1
     percentage_success = np.round((1 - total_failed / 1000) * 100, 2)
 
-    print("Testing Complete.{}% Win Rate".format(percentage_success))
+    print("Testing Complete. {}% Win Rate".format(percentage_success))
     print()
     print("Saving Metrics to models.csv...")
     df = pd.read_csv("models.csv", sep=";")
