@@ -61,29 +61,38 @@ def play(is_loop=False):
 
                 if not is_loop:
                     env.render()
+
                 break
             state = new_state
+
         if not is_loop:
             print("TOP LEFT REACHED")
             print("Attempting pick up")
+
         if not passenger_found:
             new_state, reward, _, _ = env.step(4)
             total_reward += reward
             total_steps += 1
             state = new_state
+
             if reward == -1:
                 passenger_found = True
+
                 if not is_loop:
                     print("Passenger Found...")
+
         else:
             new_state, reward, done, _ = env.step(5)
             total_reward += reward
             total_steps += 1
 
             if done:
+
                 if not is_loop:
                     print("Passenger Dropped Off")
+
                 break
+
         new_state, reward, done, _ = env.step(0)
         total_reward += reward
         total_steps += 1
@@ -96,9 +105,11 @@ def play(is_loop=False):
         new_state, reward, done, _ = env.step(0)
         total_reward += reward
         total_steps += 1
+
         if not is_loop:
             env.render()
             print("BOTTOM LEFT REACHED")
+
         if not passenger_found:
             new_state, reward, done, _ = env.step(4)
             total_reward += reward
@@ -106,16 +117,20 @@ def play(is_loop=False):
 
             if reward == -1:
                 passenger_found = True
+
                 if not is_loop:
                     print("Passenger Found...")
+
         else:
             new_state, reward, done, _ = env.step(5)
             total_reward += reward
             total_steps += 1
 
             if done:
+
                 if not is_loop:
                     print("Passenger Dropped Off")
+
                 break
 
         new_state, reward, done, _ = env.step(1)
@@ -142,9 +157,11 @@ def play(is_loop=False):
         new_state, reward, done, _ = env.step(1)
         total_reward += reward
         total_steps += 1
+
         if not is_loop:
             env.render()
             print("TOP RIGHT REACHED")
+
         if not passenger_found:
             new_state, reward, done, _ = env.step(4)
             total_reward += reward
@@ -152,16 +169,20 @@ def play(is_loop=False):
 
             if reward == -1:
                 passenger_found = True
+
                 if not is_loop:
                     print("Passenger Found...")
+
         else:
             new_state, reward, done, _ = env.step(5)
             total_reward += reward
             total_steps += 1
 
             if done:
+
                 if not is_loop:
                     print("Passenger Dropped Off")
+
                 break
         new_state, reward, done, _ = env.step(0)
         total_reward += reward
@@ -178,9 +199,11 @@ def play(is_loop=False):
         new_state, reward, done, _ = env.step(3)
         total_reward += reward
         total_steps += 1
+
         if not is_loop:
             env.render()
             print("BOTTOM RIGHT REACHED")
+
         if not passenger_found:
             new_state, reward, done, _ = env.step(4)
             total_reward += reward
@@ -188,21 +211,26 @@ def play(is_loop=False):
 
             if reward == -1:
                 passenger_found = True
+
                 if not is_loop:
                     print("Passenger Found...")
+
         else:
             new_state, reward, done, _ = env.step(5)
             total_reward += reward
             total_steps += 1
 
             if done:
+
                 if not is_loop:
                     print("Passenger Dropped Off")
+
                 break
 
     if not is_loop:
         print("[DONE] {} STEPS TOTAL / {} REWARD TOTAL".format(
             total_steps, total_reward))
+
     return total_steps, total_reward
 
 
