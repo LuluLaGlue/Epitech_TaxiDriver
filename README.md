@@ -18,6 +18,8 @@
 
 # Algorithms
 
+In order to achieve the goal set we used several algorithms of both Machine Learning and Deep Learning. Each algorithm is stored in its own folder (*DQN/*, *Q-Learning/*, *SARSA/*, and *Value Iteration/*). Each reference model we trained is store within those folders, you can find the training graphs as well as the parameters used for each reference model in the *ML and DL in Reinforcement Learning.ipynb* jupyter notebook.
+
 ## Value Iteration Algorithm
 &emsp;One of the first algorithm used for reinforcement learning was the *Value Iteration Algorithm*, its core idea is to calculate the value of each state. It loops over all states and possible actions to explore rewards of a given action and calculates the maximum possible action/reward and stores it in a table. This solution can be found in the *Value Iteration* directory with the following files:
 - ***VI_Train.py***: A python script used to train and save a new table (or model). To run it, use <code>python VI_Train.py</code> with the following possible arguments:

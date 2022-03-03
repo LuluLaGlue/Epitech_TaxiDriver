@@ -381,7 +381,7 @@ if __name__ == "__main__":
                         help="Environment to train the DQN")
     parser.add_argument("--batch_size",
                         type=int,
-                        default=128,
+                        default=32,
                         help="Batch Size")
     parser.add_argument("--gamma", type=float, default=0.99, help="GAMMA")
     parser.add_argument("--eps_start",
