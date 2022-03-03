@@ -13,12 +13,15 @@
 
 &emsp;Each action taken by the agent will result in a reward:
 - *Moving* results in a **-1** reward, this will guide the agent towards a more efficient path between objectives,
-- *picking up* or *dropping off* at a forbidden location results in a **-20** reward, this will guide the agent towards not *spamming* the *dropoff* and *pickup* actions,
+- *picking up* or *dropping off* at a forbidden location results in a **-10** reward, this will guide the agent towards not *spamming* the *dropoff* and *pickup* actions,
 - *dropping off* the passenger at the correct location results in a **+20** reward, this will guide the agent towards completing the objective and is the only positive reward available.
 
 # Algorithms
 
-In order to achieve the goal set we used several algorithms of both Machine Learning and Deep Learning. Each algorithm is stored in its own folder (*DQN/*, *Q-Learning/*, *SARSA/*, and *Value Iteration/*). Each reference model we trained is store within those folders, you can find the training graphs as well as the parameters used for each reference model in the *ML and DL in Reinforcement Learning.ipynb* jupyter notebook.
+In order to achieve the goal set we used several algorithms of both Machine Learning and Deep Learning as well as a naive bruteforce. Each algorithm is stored in its own folder (*DQN/*, *Q-Learning/*, *SARSA/*, and *Value Iteration/*). Each reference model we trained is store within those folders, you can find the training graphs as well as the parameters used for each reference model in the *ML and DL in Reinforcement Learning.ipynb* jupyter notebook.
+
+## Brute Force
+&emsp;In order to compare all algorithm with a base line, we wrote a naive bruteforce script to solve the game. This script is located in the *Bruteforce/* folder. It was able to complete the game *10 000* times with a 100% winrate, a mean number of steps of *132.69* per episode and a mean reward of *-252.88* per episode and did so in *10.93* secondes
 
 ## Value Iteration Algorithm
 &emsp;One of the first algorithm used for reinforcement learning was the *Value Iteration Algorithm*, its core idea is to calculate the value of each state. It loops over all states and possible actions to explore rewards of a given action and calculates the maximum possible action/reward and stores it in a table. This solution can be found in the *Value Iteration* directory with the following files:
@@ -117,4 +120,4 @@ In order to achieve the goal set we used several algorithms of both Machine Lear
 
 &emsp;With the resulting metrics in mind we can clearly conclude that a classic *Machine Learning* approach (Q-Learning, SARSA, etc.) is working in a small environment such as the Frozen Lake but in a more complexe environment *Deep Learning* is required to attain a sufficient win rate in a limited time. The environment in which we trained our models (Taxi-v3) is at the limit between small enough to use *Machine Learning* and big enough to benefit from *Deep Learning*, we clearly outlined the limitations of *Machine Learning* with bellow *99%* winrate in both *Q-Learning* and *SARSA* but still managed to solve the game in acceptable times, *Deep Learning* shined with both perfect win rate (*100%*) and short execution times (*17.82* secondes for *10 000* loops).
 
-&emsp;On a side note, even though *Value Iteration* obtained a *100%* winrate it took almost *50* secondes to clear the *10 000* loops which, compared to the *18* secondes of *DQN* is way to high.
+&emsp;On a side note, even though *Value Iteration* obtained a *100%* winrate it took almost *50* secondes to clear the *10 000* loops which, compared to the *18* secondes of *DQN* it is way to high. The bruteforce method also obtained a *100%* winrate and did so in a little under *11* secondes for *10 000* loops, looking at those numbers alone you could conclude that the bruteforce method is the best one as it associates a perfect winrate with fast execution but if we add the *132.69* mean number of steps and the *-252.88* mean reward per episode it shows how much it struggles to be truly efficient even in a relativly simple environment such as ours.
