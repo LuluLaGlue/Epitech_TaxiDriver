@@ -7,7 +7,6 @@ import gym
 def play(is_loop=False):
     total_steps = 0
     total_reward = 0
-    done = False
     passenger_found = False
 
     state = env.reset()
@@ -87,7 +86,7 @@ def play(is_loop=False):
                 break
 
         for s in [0, 0, 0, 0]:
-            new_state, reward, done, _ = env.step(s)
+            new_state, reward, _, _ = env.step(s)
             total_reward += reward
             total_steps += 1
 
@@ -98,7 +97,7 @@ def play(is_loop=False):
         if not passenger_found:
             if not is_loop:
                 print("Attempting Pickup")
-            new_state, reward, done, _ = env.step(4)
+            new_state, reward, _, _ = env.step(4)
             total_reward += reward
             total_steps += 1
 
@@ -123,7 +122,7 @@ def play(is_loop=False):
                 break
 
         for s in [1, 1, 2, 2, 2, 2, 1, 1]:
-            new_state, reward, done, _ = env.step(s)
+            new_state, reward, _, _ = env.step(s)
             total_reward += reward
             total_steps += 1
 
@@ -134,7 +133,7 @@ def play(is_loop=False):
         if not passenger_found:
             if not is_loop:
                 print("Attempting Pickup")
-            new_state, reward, done, _ = env.step(4)
+            new_state, reward, _, _ = env.step(4)
             total_reward += reward
             total_steps += 1
 
@@ -159,7 +158,7 @@ def play(is_loop=False):
                 break
 
         for s in [0, 0, 0, 0, 3]:
-            new_state, reward, done, _ = env.step(s)
+            new_state, reward, _, _ = env.step(s)
             total_reward += reward
             total_steps += 1
 
@@ -170,7 +169,7 @@ def play(is_loop=False):
         if not passenger_found:
             if not is_loop:
                 print("Attempting Pickup")
-            new_state, reward, done, _ = env.step(4)
+            new_state, reward, _, _ = env.step(4)
             total_reward += reward
             total_steps += 1
 
