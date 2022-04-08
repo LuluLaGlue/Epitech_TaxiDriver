@@ -50,6 +50,7 @@ In order to achieve the goal set we used several algorithms of both Machine Lear
     + <code>-e</code>: Epsilon or Exploration Rate. **Default**: 1
     + <code>--min_epsilon</code>: Minimal value for exploration rate. **Default**: 0.001
     + <code>-d</code>: Decay Rate. **Default**: 0.01
+    + <code>--show_empty</code>: Count the number of empty lines in the resulting Q Matrice. **Default**: True
     + <code>-h</code>: Display a help message.
 - ***q-table.npy***: The resulting model (or Q-Matrix) stored in a *numpy* file. It took 17 seconds to train it during *25 000* episodes.
 - ***Q-Learning_Play.py***: A python script used to play the Taxi Game based on the previously trained model (***q-table.npy**) to run it use <code>python Q-Learning_Play.py</code> with the following possible arguments:
