@@ -35,10 +35,10 @@ In order to achieve the goal set we used several algorithms of both Machine Lear
     + <code>-l</code>: Set a number of times to play the game.
     + <code>-h</code>: Display a help message.
 
-&emsp;Per its trainig logic this approach is is model based as we have to know all environment states/transitions upfront so the algorithm works.
+&emsp;Per its trainig logic this approach is model based as we have to know all environment states/transitions upfront so the algorithm works.
 
 ## Q Learning
-&emsp;In order to train a model capable of completing the task at hand without being model based we decided to use the Q Learning algorithm. This algorithm is centred around the actor (the Taxi in our case) and starts exploring on trial-and-error to update its knowledge about the model (= path to the best reward). During training, this algorithm will update a matrice containing the maximum discounted future reward for each action and state. It is based on the Bellman equation extended with a learning rate (we set it by default to *0.01* with gamma at *0.99*):
+&emsp;In order to train a model capable of completing the task at hand without being model based we decided to use the Q Learning algorithm. This algorithm is centred around the actor (the Taxi in our case) and starts exploring on trial-and-error to update its knowledge about the model (= path to the best reward). During training, this algorithm will update a matrix containing the maximum discounted future reward for each action and state. It is based on the Bellman equation extended with a learning rate (we set it by default to *0.01* with gamma at *0.99*):
 
 <code>New Q(S, A) = Q(S, A) + alpha * (R(S, A) + gamma * MaxQ'(S', A') - Q(S, A))</code>.
 
@@ -58,7 +58,7 @@ In order to achieve the goal set we used several algorithms of both Machine Lear
     + <code>-l</code>: Set a number of times to play the game (equivalent to *episodes* during training)
     + <code>-h</code>: Display a help message.
 
-&emsp;This approach is effective in our case as the only positive reward is the correct dropoff of the passenger. If the environment were to contain another positive reward the trial-and-error approach might optimize the route to it and miss out on the real goal of the game it is learning to play. In order to to limit this we implemented the Epsilon Decreasing method which consists of exploiting the current situation with probability <code>1 - epsilon</code> and exploring a new option with probability <code>epsilon</code> with epsilon decreasing over time. The Epsilon Decreasing method is particularly effective in environment such as Frozen Lakes where the game actions are not deterministic.
+&emsp;This approach is effective in our case as the only positive reward is the correct dropoff of the passenger. If the environment were to contain another positive reward the trial-and-error approach might optimize the route to it and miss out on the real goal of the game it is learning to play. In order to limit this we implemented the Epsilon Decreasing method which consists of exploiting the current situation with probability <code>1 - epsilon</code> and exploring a new option with probability <code>epsilon</code> with epsilon decreasing over time. The Epsilon Decreasing method is particularly effective in environment such as Frozen Lakes where the game actions are not deterministic.
 
 ## SARSA
 &emsp;In order to shorten the training time and explore other possible algorithm we tried to implement the SARSA algorithm. This attempt is located in the *SARSA* directory with the following files:
