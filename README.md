@@ -110,6 +110,7 @@ In order to achieve the goal set we used several algorithms of both Machine Lear
     + <code>-h</code>: Display a help message.
 - ***DQN.ipynb***: A jupyter notebook demonstrating the process to train a new model as well as the different parameters we applied to train different models with different parameters and there impact on training graphs (*epsilon*, *steps* and *reward* per episode).
 - ***models.csv***: Since trained several models to compare how each parameter influenced performances we saved each model's parameters along with its win rate in this *.csv* file.
+- ***dashboard.py***: A python script used to display comparison data between each trained models. Run <code>streamlit run dashboard.py</code> and visit *http://localhost:8501/*
 
 # Conclusions
 
