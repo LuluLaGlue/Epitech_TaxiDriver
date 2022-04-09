@@ -1,5 +1,5 @@
 # Taxi Driver
-&emsp;This repository contains our attempt at Reinforcement Learning, the goal of this project is to train an AI capable of picking up a passanger in a random spot and driving him to another random spot on a map. To do so we worked with *OpenAI*'s *gym*'s *Taxi* environment.
+&emsp;This repository contains our attempt at Reinforcement Learning, the goal of this project is to train an AI capable of picking up a passanger in a random spot and driving him to another random spot on a map. To do so we worked with *OpenAI*'s *gym*'s *Taxi* environment. To install requirements run <code>pip3 install -r requirements.txt</code>.
 
 &emsp;In this environment there are 4 different locations indicated by *R(ed)*, *B(lue)*, *Y(ellow)*, *G(reen)*. At the start of an episode, the taxi starts off at a random square and the passenger is at a random location (*R*, *B*, *Y* or *G*). The taxi must drive to the passenger's location, pick him up, drive him to his destination (another random location) and drop him off. Once the passenger is dropped off the episode ends. The Taxi can not go through walls.
 
