@@ -18,7 +18,7 @@
 
 # Algorithms
 
-In order to achieve the goal set we used several algorithms of both Machine Learning and Deep Learning as well as a naive bruteforce. Each algorithm is stored in its own folder (*DQN/*, *Q-Learning/*, *SARSA/*, and *Value Iteration/*). Each reference model we trained is store within those folders, you can find the training graphs as well as the parameters used for each reference model in the *ML and DL in Reinforcement Learning.ipynb* jupyter notebook.
+In order to achieve the goal set we used several value based algorithms as well as a naive bruteforce method. Each algorithm is stored in its own folder (*DQN/*, *Q-Learning/*, *SARSA/*, and *Value Iteration/*). Each reference model we trained is store within those folders, you can find the training graphs as well as the parameters used for each reference model in the *ML and DL in Reinforcement Learning.ipynb* jupyter notebook.
 
 ## Brute Force
 &emsp;In order to compare all algorithm with a base line, we wrote a naive bruteforce script to solve the game. This script is located in the *Bruteforce/* folder. It was able to complete the game *10 000* times with a 100% winrate, a mean number of steps of *146.03* per episode and a mean reward of *-266.43* per episode and did so in *13.44* secondes
@@ -79,7 +79,7 @@ In order to achieve the goal set we used several algorithms of both Machine Lear
     + <code>-h</code>: Display a help message.
 
 ## DQN
-&emsp;In order to train a model capable of accomplishing more complexe tasks we turned to Deep Q Learning. Indeed, the algorithm showcased before are perfect for small environment such as the Taxi driver or Frozen Lake but in more complexe environment with a lot more observation space (an Atari Video Game for exemple) they will quickly be unmanageable. Furthermore, the Q-Agent has no ability to estimate value for an unseen state, it will go back at best to to random actions. To deal with this problem *Deep Q Learning* algorithm remove the two dimensional Q-Matrix and replace it with a Neural Network. This attempt is located in the *DQN* directory with the following files:
+&emsp;In order to train a model capable of accomplishing more complexe tasks we turned to Deep Q Learning. Indeed, the algorithm showcased before are perfect for small environment such as the Taxi driver or Frozen Lake but in more complexe environment with a lot more observation space (a small Video Game for exemple) they will quickly be unmanageable. Furthermore, the Q-Agent has no ability to estimate value for an unseen state, it will go back at best to to random actions. To deal with this problem *Deep Q Learning* algorithm remove the two dimensional Q-Matrix and replace it with a Neural Network. This attempt is located in the *DQN* directory with the following files:
 - ***DQN_Train.py***: A python script used to train and save a new model. To run it use <code>python DQN_Train.py</code> with the following possible arguments:
     + <code>--environment</code>.Environment in which to train the model. **Default**: Taxi-v3
     + <code>--batch_size</code>. Batch Size during training. **Default**: 128
