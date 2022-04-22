@@ -23,6 +23,20 @@ In order to achieve the goal set we used several value based algorithms as well 
 ## Brute Force
 &emsp;In order to compare all algorithm with a base line, we wrote a naive bruteforce script to solve the game. This script is located in the *Bruteforce/* folder. It was able to complete the game *10 000* times with a 100% winrate, a mean number of steps of *146.03* per episode and a mean reward of *-266.43* per episode and did so in *13.44* secondes
 
+## Monte Carlo
+
+&emsp;The Monte Carlo Algorithm is a problem solving method that generates suitable random entries and observes a fraction of them obeying some property. In our case, the agent will first move randomly and based on the reward outcome of the movements it will update a matrix that will be later used for decision making. The matrice is a 2 dimensional dictionnary with 6 entries for each state possible. Once the matrice is filled, the agent is considered trained and should be able to take the best decision based on the state at hand. This solution can be found in the *MonteCarlo* directory with the following files:
+- ***MC_Train.py***: A python script used to train and save a new dict (or model). To run it, use <code>python MC_Train.py</code> with the following possible arguments:
+    + <code>-e</code>: Number of episodes to run during training. **Default**: 25000
+- ***policy.pkl***: The resulting dict stored in a pickle file.
+- ***MC_Play.py***: A python script used to play the Taxi Game based on the previously trained model (***policy.pkl***). To run it use <code>python MC_Play.py</code> with the following possible arguments:
+    + <code>-s</code>: Activate Slow Mode.
+    + <code>-r</code> Activate Render.
+    + <code>-l</code>: Set a number of times to play the game.
+    + <code>-h</code>: Display a help message.
+
+&emsp;This method is on-policy as the model learns from solving the problem (playing the game) and not by observing. During training we noticed that it took a lot of episodes for it to begin to show proper results, indeed for *25 000* episodes of training we reached only a *15%* win rate, for *100 000* episodes *65%* win rate and for *100 000* episodes *99.54%* win rate.
+
 ## Value Iteration Algorithm
 &emsp;One of the first algorithm used for reinforcement learning was the *Value Iteration Algorithm*, its core idea is to calculate the value of each state. It loops over all states and possible actions to explore rewards of a given action and calculates the maximum possible action/reward and stores it in a table. This solution can be found in the *Value Iteration* directory with the following files:
 - ***VI_Train.py***: A python script used to train and save a new table (or model). To run it, use <code>python VI_Train.py</code> with the following possible arguments:
@@ -115,7 +129,8 @@ In order to achieve the goal set we used several value based algorithms as well 
 # Conclusions
 
 &emsp;For every algorithm/approach we tried, we manage to setup a fonctionnal agent capable of effectively completing the game.
-- We started with the Value Iteration algorithm which took *48.96* secondes to solve the game *10 000* times with an average *14.06* steps and *7.94* reward per episode and a *100%* win rate.
+- We started with the Monte Carlo algorithm which took *48.45* secondes to solve the game *10 000* times with an average *17.53* steps and *1.98* reward per episode and a *99.54%* win rate, contrary to the next algorithms the training took *100 000* episodes when the other one only *25 000* at most.
+- After that we used the Value Iteration algorithm which took *48.96* secondes to solve the game *10 000* times with an average *14.06* steps and *7.94* reward per episode and a *100%* win rate.
 - We then used the *Q-Learning* algorithm based on a Q-Matrix and trained it with several parameters (we settled with <code>gamma = 0.99</code>, <code>Learning Rate = 0.01</code>, <code>minimal epsilon = 0.001</code> and <code>Decay Rate = 0.01</code>), the resulting model takes *50.32* secondes to solve the game *10 000* times with an average *15.35* steps and *6.33* reward per episode and a *98.48%* win rate.
 - In order to improve those metrics we used the *SARSA* algorithm and tuned it in the same way as the *Q-Learning* one (we settled with <code>alpha = 0.85</code>, <code>gamma = 0.99</code>, <code>minimal epsilon = 0.001</code> and <code>Decay Rate = 0.01</code>) we managed to solve the game *10 000* times in *49.43* secondes with an average *16.18* steps and *-7.13* reward per episode and a *98.56%* win rate.
 - Finally, we trained 2 *Deep Q Learning* algorithm based on 2 different architectures, after fine tuning the parameters we settled with <code>batch_size = 128</code>, <code>gamma = 0.99</code>, <code>minimal epsilon = 0.1</code>, <code>epsilon decay = 400</code>, <code>number of episodes betzeen each model update = 20</code>, <code>max number of steps per episode = 100</code>, <code>save frequency = 1000</code>, <code>learning rate = 0.001</code>, <code>minimal learning rate = 0.0001</code>, <code>learning rate decay = 5000</code>, <code>memory size = 50000</code>, <code>architecture = 2</code>. With the best architecture and parameters we trained we achieved *10 000* games in *17.82* secondes with an average *13.10* steps and *7.90* reward per episode and a *100%* win rate.

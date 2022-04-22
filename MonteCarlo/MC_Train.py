@@ -4,8 +4,8 @@ from IPython.display import clear_output
 from time import sleep
 import random
 import time
-import json
 import argparse
+import pickle
 
 # NEED TO REORGANIZE CODE + CLEAN IT + ADD PLAY SCRIPT WITH JSON READ
 
@@ -62,16 +62,6 @@ def run_game(env, policy, display=True):
     return episode
 
 
-def test_policy(policy, env):
-    wins = 0
-    r = 100
-    for i in range(r):
-        w = run_game(env, policy, display=False)[-1][-1]
-        if w == 1:
-            wins += 1
-    return wins / r
-
-
 def monte_carlo_e_soft(env, episodes=100, policy=None, epsilon=0.01):
     if not policy:
         policy = create_random_policy(
@@ -80,9 +70,8 @@ def monte_carlo_e_soft(env, episodes=100, policy=None, epsilon=0.01):
         env, policy
     )  # Empty dictionary for storing rewards for each state-action pair
     returns = {}  # 3.
-
+    start_episode = time.time()
     for e in range(episodes):  # Looping through episodes
-        start_episode = time.time()
         G = 0  # Store cumulative reward in G (initialized at 0)
         episode = run_game(
             env=env, policy=policy,
@@ -125,6 +114,7 @@ def monte_carlo_e_soft(env, episodes=100, policy=None, epsilon=0.01):
 
         if e % int(episodes / 10) == 0:
             episode_time = (time.time() - start_episode)
+            start_episode = time.time()
             print("[EPISODE {}/{}] - {} secondes.".format(
                 e,
                 episodes,
@@ -148,12 +138,5 @@ if __name__ == "__main__":
     env = gym.make("Taxi-v3")
     policy = monte_carlo_e_soft(env, episodes=args.episodes)
 
-    j = json.dumps(policy)
-    f = open("policy.json", "w")
-    f.write(j)
-    f.close
-
-    # policy = json.load(open("policy.json"))
-    # print(policy)
-    # wr = test_policy(policy, env)
-    # print(wr)
+    with open('policy.pkl', 'wb') as f:
+        pickle.dump(policy, f)
