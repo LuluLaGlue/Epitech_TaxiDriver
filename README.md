@@ -35,7 +35,7 @@ In order to achieve the goal set we used several value based algorithms as well 
     + <code>-l</code>: Set a number of times to play the game.
     + <code>-h</code>: Display a help message.
 
-&emsp;This method is on-policy as the model learns from solving the problem (playing the game) and not by observing. During training we noticed that it took a lot of episodes for it to begin to show proper results, indeed for *25 000* episodes of training we reached only a *15%* win rate, for *100 000* episodes *65%* win rate and for *100 000* episodes *99.54%* win rate.
+&emsp;This method is on-policy as the model learns from solving the problem (playing the game) and not by observing. During training we noticed that it took a lot of episodes for it to begin to show proper results, indeed for *25 000* episodes of training we reached only a *15%* win rate, for *100 000* episodes *65%* win rate and for *500 000* episodes *99.54%* win rate.
 
 ## Value Iteration Algorithm
 &emsp;One of the first algorithm used for reinforcement learning was the *Value Iteration Algorithm*, its core idea is to calculate the value of each state. It loops over all states and possible actions to explore rewards of a given action and calculates the maximum possible action/reward and stores it in a table. This solution can be found in the *Value Iteration* directory with the following files:
