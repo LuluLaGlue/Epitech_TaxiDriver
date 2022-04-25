@@ -1,13 +1,9 @@
 import gym
 import numpy as np
-from IPython.display import clear_output
-from time import sleep
 import random
 import time
 import argparse
 import pickle
-
-# NEED TO REORGANIZE CODE + CLEAN IT + ADD PLAY SCRIPT WITH JSON READ
 
 
 def create_random_policy(env):
@@ -27,17 +23,13 @@ def create_state_action_dictionary(env, policy):
     return Q
 
 
-def run_game(env, policy, display=True):
+def run_game(env, policy):
     env.reset()
     episode = []
     finished = False
 
     while not finished:
         s = env.env.s
-        if display:
-            clear_output(True)
-            env.render()
-            sleep(1)
 
         timestep = []
         timestep.append(s)
@@ -54,28 +46,24 @@ def run_game(env, policy, display=True):
 
         episode.append(timestep)
 
-    if display:
-        clear_output(True)
-        env.render()
-        sleep(1)
-
     return episode
 
 
-def monte_carlo_e_soft(env, episodes=100, policy=None, epsilon=0.01):
-    if not policy:
-        policy = create_random_policy(
-            env)  # Create an empty dictionary to store state action values
+def monte_carlo_e_soft(env, episodes=100, epsilon=0.01):
+    policy = create_random_policy(
+        env)  # Create an empty dictionary to store state action values
     Q = create_state_action_dictionary(
         env, policy
     )  # Empty dictionary for storing rewards for each state-action pair
-    returns = {}  # 3.
+    returns = {}
     start_episode = time.time()
-    for e in range(episodes):  # Looping through episodes
+
+    for e in range(episodes):
         G = 0  # Store cumulative reward in G (initialized at 0)
         episode = run_game(
-            env=env, policy=policy,
-            display=False)  # Store state, action and value respectively
+            env=env,
+            policy=policy)  # Store state, action and value respectively
+        print(episode)
 
         # for loop through reversed indices of episode array.
         # The logic behind it being reversed is that the eventual reward would be at the end.
