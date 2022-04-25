@@ -9,7 +9,7 @@ from IPython import display
 import torch.optim as optim
 
 
-def import_model(path):
+def import_model(path: str) -> tuple:
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     checkpoint = torch.load(path)
 
@@ -27,7 +27,7 @@ def import_model(path):
     return optimizer, model, device
 
 
-def get_action_for_state(state, model, device):
+def get_action_for_state(state: int, model, device) -> list:
     with torch.no_grad():
         # t.max(1) will return largest column value of each row.
         # second column on max result is index of where max element was
@@ -43,7 +43,7 @@ def play(model,
          render: bool = False,
          max_steps: int = 100,
          slow: bool = False,
-         is_loop: bool = False):
+         is_loop: bool = False) -> tuple[int, int, bool]:
     # Play an episode
     actions_str = ["South", "North", "East", "West", "Pickup", "Dropoff"]
 

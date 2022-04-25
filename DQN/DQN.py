@@ -1,11 +1,10 @@
-from turtle import forward
 import torch.nn as nn
 import torch.nn.functional as F
 
 
 class DQN(nn.Module):
 
-    def __init__(self, input, outputs):
+    def __init__(self, input: int, outputs: int):
         super(DQN, self).__init__()
         self.emb = nn.Embedding(input, 4)
         self.l1 = nn.Linear(4, 50)
@@ -22,7 +21,7 @@ class DQN(nn.Module):
 
 class DQN_2(nn.Module):
 
-    def __init__(self, input, outputs):
+    def __init__(self, input: int, outputs: int):
         super(DQN_2, self).__init__()
         self.emb = nn.Embedding(input, 6)
         self.l1 = nn.Linear(6, 50)

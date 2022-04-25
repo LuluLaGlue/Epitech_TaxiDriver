@@ -26,23 +26,23 @@ class TrainingAgent():
 
     def __init__(self,
                  env=gym.make("Taxi-v3").env,
-                 batch_size=128,
-                 gamma=0.99,
-                 eps_start=1,
-                 eps_end=0.1,
-                 eps_decay=400,
-                 target_update=20,
-                 max_steps_per_episode=100,
-                 warmup_episode=10,
-                 save_freq=1000,
-                 lr=0.001,
-                 lr_min=0.0001,
-                 lr_decay=5000,
-                 memory_size=50000,
-                 num_episodes=10000,
-                 name=None,
-                 architecture=2,
-                 save=True) -> None:
+                 batch_size: int = 128,
+                 gamma: float = 0.99,
+                 eps_start: float = 1,
+                 eps_end: float = 0.1,
+                 eps_decay: float = 400,
+                 target_update: int = 20,
+                 max_steps_per_episode: int = 100,
+                 warmup_episode: int = 10,
+                 save_freq: int = 1000,
+                 lr: float = 0.001,
+                 lr_min: float = 0.0001,
+                 lr_decay: int = 5000,
+                 memory_size: int = 50000,
+                 num_episodes: int = 10000,
+                 name: str = None,
+                 architecture: int = 2,
+                 save: bool = True) -> None:
         self.config = {
             "BATCH_SIZE": batch_size,
             "GAMMA": gamma,
@@ -92,7 +92,7 @@ class TrainingAgent():
         print(" - MEMORY: {}.".format(self.config["MEMORY_SIZE"]))
         print()
 
-    def import_model(self, id) -> None:
+    def import_model(self, id: str) -> None:
         '''Import an existing agent to finish training based on previously set parameters'''
         try:
             n_actions = self.env.action_space.n
@@ -150,7 +150,7 @@ class TrainingAgent():
         self.optimizer = optim.Adam(self.model.parameters(),
                                     lr=self.config["LR"])
 
-    def _get_epsilon(self, episode) -> float:
+    def _get_epsilon(self, episode: int) -> float:
         '''Calculate Epsilon value depending on the number of episode'''
         epsilon = self.config["EPS_END"] + \
                           (self.config["EPS_START"] - self.config["EPS_END"]) * \
@@ -158,7 +158,7 @@ class TrainingAgent():
 
         return epsilon
 
-    def _get_action_for_state(self, state):
+    def _get_action_for_state(self, state: int):
         '''Returns an action choosen by the agent based on a state'''
         with torch.no_grad():
             predicted = self.model(torch.tensor([state], device=self.device))
@@ -166,7 +166,7 @@ class TrainingAgent():
 
         return action.item()
 
-    def _choose_action(self, state, epsilon) -> int:
+    def _choose_action(self, state: int, epsilon: int) -> int:
         '''Defines whether to choose an action or explore'''
         if self.rng.uniform() < epsilon:
             action = self.env.action_space.sample()
@@ -175,7 +175,8 @@ class TrainingAgent():
 
         return action
 
-    def _remember(self, state, action, next_state, reward, done) -> None:
+    def _remember(self, state: int, action: int, next_state: int, reward: int,
+                  done: bool) -> None:
         '''Store state, action, next_state, reward, and status in memory'''
         self.memory.push(
             torch.tensor([state], device=self.device),
@@ -217,7 +218,7 @@ class TrainingAgent():
 
         self.optimizer.step()
 
-    def _adjust_learning_rate(self, episode) -> None:
+    def _adjust_learning_rate(self, episode: int) -> None:
         '''Update Learning Rate based on number of episode'''
         delta = self.config["LR"] - self.config["LR_MIN"]
         base = self.config["LR_MIN"]
@@ -311,7 +312,7 @@ class TrainingAgent():
         self.save()
 
     @staticmethod
-    def _moving_average(x, periods=5) -> list:
+    def _moving_average(x: list, periods=5) -> list:
         if len(x) < periods:
 
             return x

@@ -4,7 +4,7 @@ import time
 import gym
 
 
-def play(is_loop=False):
+def play(is_loop: bool = False) -> tuple[int, int]:
     total_steps = 0
     total_reward = 0
     passenger_found = False

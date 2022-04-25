@@ -5,7 +5,7 @@ import time
 import gym
 
 
-def choose_action(state, n_actions, V):
+def choose_action(state: int, n_actions: int, V: dict) -> int:
     best_action = None
     best_value = float('-inf')
 
@@ -22,7 +22,9 @@ def choose_action(state, n_actions, V):
     return best_action
 
 
-def train(env=gym.make("Taxi-v3"), gamma=0.9, significant_improvement=0.001):
+def train(env=gym.make("Taxi-v3"),
+          gamma: float = 0.9,
+          significant_improvement: float = 0.001) -> tuple[float, int]:
     env.reset()
     n_actions = env.action_space.n
     n_observations = env.observation_space.n

@@ -5,7 +5,9 @@ import time
 import gym
 
 
-def play(slow=False, render=False, is_loop=False):
+def play(slow: bool = False,
+         render: bool = False,
+         is_loop: bool = False) -> tuple[int, int]:
     env = gym.make("Taxi-v3")
     state = env.reset()
 

@@ -1,15 +1,15 @@
-import gym
 import numpy as np
-from IPython.display import clear_output
-from time import sleep
-import random
-import time
-import json
 import argparse
+import random
 import pickle
+import time
+import gym
 
 
-def play(policy, slow=False, render=False, is_loop=False):
+def play(policy: dict,
+         slow: bool = False,
+         render: bool = False,
+         is_loop: bool = False) -> tuple[int, int]:
     env = gym.make("Taxi-v3")
     env.reset()
     episode = []
@@ -51,6 +51,7 @@ def play(policy, slow=False, render=False, is_loop=False):
 
         if steps >= 100:
             break
+
     if not is_loop:
         print("[{} MOVES] - Total reward: {}".format(steps, result))
 

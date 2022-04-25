@@ -13,7 +13,7 @@ if is_notebook:
     from IPython import display
 
 
-def moving_average(x, periods=5):
+def moving_average(x: list, periods: int = 5) -> list:
     if len(x) < periods:
 
         return x
@@ -24,10 +24,10 @@ def moving_average(x, periods=5):
     return np.hstack([x[:periods - 1], res])
 
 
-def plot_durations(episode_durations,
-                   reward_in_episode,
-                   epsilon_vec,
-                   max_steps_per_episode=100):
+def plot_durations(episode_durations: list,
+                   reward_in_episode: list,
+                   epsilon_vec: list,
+                   max_steps_per_episode: int = 100) -> None:
     '''Plot graphs containing Epsilon, Rewards, and Steps per episode over time'''
     lines = []
     fig = plt.figure(1, figsize=(15, 7))
@@ -57,15 +57,17 @@ def plot_durations(episode_durations,
         plt.show()
     plt.pause(0.001)
 
+    return
 
-def train(episodes=25000,
-          lr=0.01,
-          gamma=0.99,
-          epsilon=1,
-          max_epsilon=1,
-          min_epsilon=0.001,
-          epsilon_decay=0.01,
-          show_empty=True):
+
+def train(episodes: int = 25000,
+          lr: float = 0.01,
+          gamma: float = 0.99,
+          epsilon: float = 1,
+          max_epsilon: float = 1,
+          min_epsilon: float = 0.001,
+          epsilon_decay: float = 0.01,
+          show_empty: bool = True) -> tuple[float, int]:
     q_table = np.zeros([env.observation_space.n, env.action_space.n])
 
     total_reward = []

@@ -6,7 +6,8 @@ import argparse
 import pickle
 
 
-def create_random_policy(env):
+def create_random_policy(env) -> dict:
+    '''Create an empty dictionary to store state action values'''
     policy = {}
     for key in range(0, env.observation_space.n):
         p = {}
@@ -16,14 +17,16 @@ def create_random_policy(env):
     return policy
 
 
-def create_state_action_dictionary(env, policy):
+def create_state_action_dictionary(env, policy: dict) -> dict:
+    '''Create an empty dictionary for storing rewards for each state-action pair'''
     Q = {}
     for key in policy.keys():
         Q[key] = {a: 0.0 for a in range(0, env.action_space.n)}
     return Q
 
 
-def run_game(env, policy):
+def run_game(env, policy: dict) -> list[list[int]]:
+    '''Plays the game and returns a list of [state, action, reward]'''
     env.reset()
     episode = []
     finished = False
@@ -49,21 +52,17 @@ def run_game(env, policy):
     return episode
 
 
-def monte_carlo_e_soft(env, episodes=100, epsilon=0.01):
-    policy = create_random_policy(
-        env)  # Create an empty dictionary to store state action values
-    Q = create_state_action_dictionary(
-        env, policy
-    )  # Empty dictionary for storing rewards for each state-action pair
+def monte_carlo_e_soft(env,
+                       episodes: int = 100,
+                       epsilon: float = 0.01) -> dict:
+    policy = create_random_policy(env)
+    Q = create_state_action_dictionary(env, policy)
     returns = {}
     start_episode = time.time()
 
     for e in range(episodes):
         G = 0  # Store cumulative reward in G (initialized at 0)
-        episode = run_game(
-            env=env,
-            policy=policy)  # Store state, action and value respectively
-        print(episode)
+        episode = run_game(env=env, policy=policy)
 
         # for loop through reversed indices of episode array.
         # The logic behind it being reversed is that the eventual reward would be at the end.
@@ -89,7 +88,7 @@ def monte_carlo_e_soft(env, episodes=100, epsilon=0.01):
                 indices = [i for i, x in enumerate(Q_list) if x == max(Q_list)]
                 max_Q = random.choice(indices)
 
-                A_star = max_Q  # 14.
+                A_star = max_Q
 
                 for a in policy[s_t].items(
                 ):  # Update action probability for s_t in policy
@@ -109,6 +108,9 @@ def monte_carlo_e_soft(env, episodes=100, epsilon=0.01):
                 np.round(episode_time, 4),
             ))
 
+    with open('policy.pkl', 'wb') as f:
+        pickle.dump(policy, f)
+
     return policy
 
 
@@ -125,6 +127,3 @@ if __name__ == "__main__":
 
     env = gym.make("Taxi-v3")
     policy = monte_carlo_e_soft(env, episodes=args.episodes)
-
-    with open('policy.pkl', 'wb') as f:
-        pickle.dump(policy, f)
