@@ -1,10 +1,13 @@
 import numpy as np
+import datetime
 import argparse
 import time
 import gym
+import sys
 
 
-def play(is_loop: bool = False) -> tuple[int, int]:
+def play(env=gym.make("Taxi-v3"), is_loop: bool = False,
+         is_time: bool = False) -> tuple[int, int]:
     total_steps = 0
     total_reward = 0
     passenger_found = False
@@ -23,7 +26,7 @@ def play(is_loop: bool = False) -> tuple[int, int]:
             total_steps += 1
             total_reward += reward
 
-        if not is_loop:
+        if not is_loop and not is_time:
             print("TOP REACHED")
             env.render()
 
@@ -53,12 +56,12 @@ def play(is_loop: bool = False) -> tuple[int, int]:
 
             state = new_state
 
-        if not is_loop:
+        if not is_loop and not is_time:
             print("TOP LEFT REACHED")
             env.render()
 
         if not passenger_found:
-            if not is_loop:
+            if not is_loop and not is_time:
                 print("Attempting Pickup")
             new_state, reward, _, _ = env.step(4)
             total_reward += reward
@@ -68,11 +71,11 @@ def play(is_loop: bool = False) -> tuple[int, int]:
             if reward == -1:
                 passenger_found = True
 
-                if not is_loop:
+                if not is_loop and not is_time:
                     print("Passenger Found...")
 
         else:
-            if not is_loop:
+            if not is_loop and not is_time:
                 print("Attempting Dropoff")
             new_state, reward, done, _ = env.step(5)
             total_reward += reward
@@ -80,7 +83,7 @@ def play(is_loop: bool = False) -> tuple[int, int]:
 
             if done:
 
-                if not is_loop:
+                if not is_loop and not is_time:
                     print("Passenger Dropped Off")
 
                 break
@@ -90,12 +93,12 @@ def play(is_loop: bool = False) -> tuple[int, int]:
             total_reward += reward
             total_steps += 1
 
-        if not is_loop:
+        if not is_loop and not is_time:
             print("BOTTOM LEFT REACHED")
             env.render()
 
         if not passenger_found:
-            if not is_loop:
+            if not is_loop and not is_time:
                 print("Attempting Pickup")
             new_state, reward, _, _ = env.step(4)
             total_reward += reward
@@ -104,11 +107,11 @@ def play(is_loop: bool = False) -> tuple[int, int]:
             if reward == -1:
                 passenger_found = True
 
-                if not is_loop:
+                if not is_loop and not is_time:
                     print("Passenger Found...")
 
         else:
-            if not is_loop:
+            if not is_loop and not is_time:
                 print("Attempting Dropoff")
             new_state, reward, done, _ = env.step(5)
             total_reward += reward
@@ -116,7 +119,7 @@ def play(is_loop: bool = False) -> tuple[int, int]:
 
             if done:
 
-                if not is_loop:
+                if not is_loop and not is_time:
                     print("Passenger Dropped Off")
 
                 break
@@ -126,12 +129,12 @@ def play(is_loop: bool = False) -> tuple[int, int]:
             total_reward += reward
             total_steps += 1
 
-        if not is_loop:
+        if not is_loop and not is_time:
             print("TOP RIGHT REACHED")
             env.render()
 
         if not passenger_found:
-            if not is_loop:
+            if not is_loop and not is_time:
                 print("Attempting Pickup")
             new_state, reward, _, _ = env.step(4)
             total_reward += reward
@@ -140,11 +143,11 @@ def play(is_loop: bool = False) -> tuple[int, int]:
             if reward == -1:
                 passenger_found = True
 
-                if not is_loop:
+                if not is_loop and not is_time:
                     print("Passenger Found...")
 
         else:
-            if not is_loop:
+            if not is_loop and not is_time:
                 print("Attempting Dropoff")
             new_state, reward, done, _ = env.step(5)
             total_reward += reward
@@ -152,7 +155,7 @@ def play(is_loop: bool = False) -> tuple[int, int]:
 
             if done:
 
-                if not is_loop:
+                if not is_loop and not is_time:
                     print("Passenger Dropped Off")
 
                 break
@@ -162,12 +165,12 @@ def play(is_loop: bool = False) -> tuple[int, int]:
             total_reward += reward
             total_steps += 1
 
-        if not is_loop:
+        if not is_loop and not is_time:
             print("BOTTOM RIGHT REACHED")
             env.render()
 
         if not passenger_found:
-            if not is_loop:
+            if not is_loop and not is_time:
                 print("Attempting Pickup")
             new_state, reward, _, _ = env.step(4)
             total_reward += reward
@@ -176,11 +179,11 @@ def play(is_loop: bool = False) -> tuple[int, int]:
             if reward == -1:
                 passenger_found = True
 
-                if not is_loop:
+                if not is_loop and not is_time:
                     print("Passenger Found...")
 
         else:
-            if not is_loop:
+            if not is_loop and not is_time:
                 print("Attempting Dropoff")
             new_state, reward, done, _ = env.step(5)
             total_reward += reward
@@ -188,22 +191,48 @@ def play(is_loop: bool = False) -> tuple[int, int]:
 
             if done:
 
-                if not is_loop:
+                if not is_loop and not is_time:
                     print("Passenger Dropped Off")
 
                 break
 
-    if not is_loop:
+    if not is_loop and not is_time:
         print("[DONE] {} STEPS TOTAL / {} REWARD TOTAL".format(
             total_steps, total_reward))
 
     return total_steps, total_reward
 
 
+def display_data(total, start, mean_steps, mean_result):
+    print()
+    print(
+        "[{} LOOP DONE -  {} SECONDES] - Mean Steps Per Loop: {} - Max Steps For a Loop: {} - Mean Reward Per Loop: {}"
+        .format(total, np.round(time.time() - start, 4),
+                np.round(mean_steps / total, 2), np.max(max_steps),
+                np.round(mean_result / total, 2)))
+
+
+def error_args(args):
+    time = args.time
+    loop = args.loop
+
+    if time < 0:
+        return 1, "Time can not be negative or null."
+    if loop <= 0:
+        return 1, "Number of loop can not be negative or null"
+
+    return 0, ""
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Solve the Taxi Driver Game Using the Q-Learning Algorithm"
     )
+    parser.add_argument("-t",
+                        "--time",
+                        type=int,
+                        help="Run play for x seconds",
+                        default=0)
     parser.add_argument(
         "-s",
         "--slow",
@@ -226,23 +255,34 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
+    code, msg = error_args(args)
+    if code != 0:
+        print("[ERROR] - {}".format(msg))
+
+        sys.exit(1)
     start = time.time()
+    maxrt = datetime.timedelta(seconds=args.time) if args.time != 0 else None
+
     mean_steps, mean_result = 0, 0
     max_steps = []
     is_loop = True if args.loop != 1 else False
 
     env = gym.make("Taxi-v3")
 
-    for l in range(args.loop):
-        steps, result = play(is_loop=is_loop)
-        max_steps.append(steps)
-        mean_steps += steps
-        mean_result += result
-
-    if is_loop:
-        print()
-        print(
-            "[{} LOOP DONE -  {} SECONDES] - Mean Steps Per Loop: {} - Max Steps For a Loop: {} - Mean Reward Per Loop: {}"
-            .format(args.loop, np.round(time.time() - start, 4),
-                    np.round(mean_steps / args.loop, 2), np.max(max_steps),
-                    np.round(mean_result / args.loop, 2)))
+    if maxrt != None:
+        stop = datetime.datetime.now() + maxrt
+        total = 0
+        while datetime.datetime.now() < stop:
+            steps, result = play(env=env, is_loop=is_loop, is_time=True)
+            max_steps.append(steps)
+            mean_steps += steps
+            mean_result += result
+            total += 1
+        display_data(total, start, mean_steps, mean_result)
+    else:
+        for l in range(args.loop):
+            steps, result = play(env=env, is_loop=is_loop, is_time=False)
+            max_steps.append(steps)
+            mean_steps += steps
+            mean_result += result
+        display_data(args.loop, start, mean_steps, mean_result)

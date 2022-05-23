@@ -1,8 +1,10 @@
 import gym
+import sys
 import time
 import torch
 import random
 import argparse
+import datetime
 import numpy as np
 from DQN import DQN, DQN_2
 from IPython import display
@@ -37,13 +39,14 @@ def get_action_for_state(state: int, model, device) -> list:
     return action.item()
 
 
-def play(model,
-         device=torch.device("cpu"),
-         env=gym.make("Taxi-v3").env,
-         render: bool = False,
-         max_steps: int = 100,
-         slow: bool = False,
-         is_loop: bool = False) -> tuple[int, int, bool]:
+def solve(model,
+          device=torch.device("cpu"),
+          env=gym.make("Taxi-v3").env,
+          render: bool = False,
+          max_steps: int = 100,
+          slow: bool = False,
+          is_loop: bool = False,
+          is_time: bool = False) -> tuple[int, int, bool]:
     # Play an episode
     actions_str = ["South", "North", "East", "West", "Pickup", "Dropoff"]
 
@@ -61,7 +64,8 @@ def play(model,
         state, reward, done, _ = env.step(action)
         total_reward += reward
         display.clear_output(wait=True)
-        if render or (random.uniform(0, 1) < 0.3 and not is_loop):
+        if render or (random.uniform(0, 1) < 0.3 and not is_loop
+                      and not is_time):
             env.render()
             print(
                 f"Iter: {iteration} - Action: {action}({actions_str[action]}) - Reward {reward}"
@@ -71,11 +75,59 @@ def play(model,
         elif slow and not done:
             input("Press anything to continue...")
             print("\r", end="\r")
-    if not is_loop or iteration >= 100:
+    if (not is_loop and not is_time):
         print("[{}/{} MOVES] - Total reward: {}".format(
             iteration, max_steps, total_reward))
 
     return iteration, total_reward, done
+
+
+def play(mean_steps, mean_result, total_failed, is_time, is_loop):
+    steps, result, done = solve(model,
+                                render=render,
+                                slow=slow,
+                                env=env,
+                                max_steps=max,
+                                device=device,
+                                is_loop=is_loop,
+                                is_time=is_time)
+    mean_steps += steps
+    mean_result += result
+    if not done:
+        total_failed += 1
+
+    return steps, result, mean_steps, mean_result
+
+
+def display_data(total, total_failed, start, mean_steps, mean_result):
+    print()
+    print(
+        "[{} LOOP DONE - {}% FAILED - {} SECONDES] - Mean Steps Per Loop: {} - Mean Reward Per Loop: {}"
+        .format(total, np.round(total_failed / total * 100, 2),
+                np.round(time.time() - start, 4),
+                np.round(mean_steps / total, 2),
+                np.round(mean_result / total, 2)))
+
+
+def error_args(args):
+    path = args.path
+    max_steps = args.max
+    time = args.time
+    loop = args.loop
+
+    try:
+        open(path, "r")
+    except OSError:
+        return 1, "Model path is invalid."
+
+    if max_steps <= 0:
+        return 1, "Max number of steps can not be lower than 1."
+    if time < 0:
+        return 1, "Time can not be negative or null."
+    if loop <= 0:
+        return 1, "Number of loop can not be negative or null"
+
+    return 0, ""
 
 
 if __name__ == "__main__":
@@ -113,42 +165,57 @@ if __name__ == "__main__":
                         type=int,
                         help="How many times to play the game",
                         default=1)
+    parser.add_argument("-t",
+                        "--time",
+                        type=int,
+                        default=0,
+                        help="Run play for x seconds")
     args = parser.parse_args()
+    code, msg = error_args(args)
+
+    if code != 0:
+        print("[ERROR] - {}".format(msg))
+
+        sys.exit(1)
+
     path = args.path
     render = args.render
     slow = args.slow
     max = args.max
     loop = args.loop
+    max_time = args.time
 
     if slow:
         render = True
 
     start = time.time()
     env = gym.make("Taxi-v3").env
-    optimizer, model, device = import_model(path)
+    _, model, device = import_model(path)
 
     mean_steps, mean_result = 0, 0
     total_failed = 0
     is_loop = True if args.loop != 1 else False
+    maxrt = datetime.timedelta(seconds=max_time) if max_time != 0 else None
 
-    for l in range(loop):
-        steps, result, done = play(model,
-                                   render=render,
-                                   slow=slow,
-                                   env=env,
-                                   max_steps=max,
-                                   device=device,
-                                   is_loop=is_loop)
-        mean_steps += steps
-        mean_result += result
-        if not done:
-            total_failed += 1
+    if maxrt != None:
+        stop = datetime.datetime.now() + maxrt
+        total = 0
+        while datetime.datetime.now() < stop:
+            steps, result, mean_steps, mean_result = play(mean_steps,
+                                                          mean_result,
+                                                          total_failed,
+                                                          is_time=True,
+                                                          is_loop=is_loop)
+            total += 1
+        display_data(total, total_failed, start, mean_steps, mean_result)
+    else:
 
-    if is_loop:
-        print()
-        print(
-            "[{} LOOP DONE - {}% FAILED - {} SECONDES] - Mean Steps Per Loop: {} - Mean Reward Per Loop: {}"
-            .format(loop, np.round(total_failed / loop * 100, 2),
-                    np.round(time.time() - start, 4),
-                    np.round(mean_steps / loop, 2),
-                    np.round(mean_result / loop, 2)))
+        for l in range(loop):
+            steps, result, mean_steps, mean_result = play(mean_steps,
+                                                          mean_result,
+                                                          total_failed,
+                                                          is_time=False,
+                                                          is_loop=is_loop)
+
+        if is_loop:
+            display_data(loop, total_failed, start, mean_steps, mean_result)
