@@ -33,6 +33,7 @@ In order to achieve the goal set we used several value based algorithms as well 
     + <code>-s</code>: Activate Slow Mode.
     + <code>-r</code> Activate Render.
     + <code>-l</code>: Set a number of times to play the game.
+    + <code>-t</code>: Set a duration in seconds. The agent will play the game in loop for this duration.
     + <code>-h</code>: Display a help message.
 
 &emsp;This method is on-policy as the model learns from solving the problem (playing the game) and not by observing. During training we noticed that it took a lot of episodes for it to begin to show proper results, indeed for *25 000* episodes of training we reached only a *15%* win rate, for *100 000* episodes *65%* win rate and for *500 000* episodes *99.54%* win rate.
@@ -47,6 +48,7 @@ In order to achieve the goal set we used several value based algorithms as well 
     + <code>-s</code>: Activate Slow Mode.
     + <code>-r</code>: Activate Render.
     + <code>-l</code>: Set a number of times to play the game.
+    + <code>-t</code>: Set a duration in seconds. The agent will play the game in loop for this duration.
     + <code>-h</code>: Display a help message.
 
 &emsp;Per its trainig logic this approach is model based as we have to know all environment states/transitions upfront so the algorithm works.
@@ -70,7 +72,8 @@ In order to achieve the goal set we used several value based algorithms as well 
 - ***Q-Learning_Play.py***: A python script used to play the Taxi Game based on the previously trained model (***q-table.npy**) to run it use <code>python Q-Learning_Play.py</code> with the following possible arguments:
     + <code>-s</code>: Activate Slow Mode.
     + <code>-r</code>: Activate Render.
-    + <code>-l</code>: Set a number of times to play the game (equivalent to *episodes* during training)
+    + <code>-l</code>: Set a number of times to play the game (equivalent to *episodes* during training).
+    + <code>-t</code>: Set a duration in seconds. The agent will play the game in loop for this duration.
     + <code>-h</code>: Display a help message.
 
 &emsp;This approach is effective in our case as the only positive reward is the correct dropoff of the passenger. If the environment were to contain another positive reward the trial-and-error approach might optimize the route to it and miss out on the real goal of the game it is learning to play. In order to limit this we implemented the Epsilon Decreasing method which consists of exploiting the current situation with probability <code>1 - epsilon</code> and exploring a new option with probability <code>epsilon</code> with epsilon decreasing over time. The Epsilon Decreasing method is particularly effective in environment such as Frozen Lakes where the game actions are not deterministic.
@@ -89,7 +92,8 @@ In order to achieve the goal set we used several value based algorithms as well 
 - ***SARSA_Play.py***: A python script used to play the Taxi Game based on the previously trained model (***q-table.npy***) to run it use <code>python SARSA_Play.py</code> with the following possible arguments:
     + <code>-s</code>: Activate Slow Mode.
     + <code>-r</code>: Activate Render.
-    + <code>-l</code>: Set a number of times to play the game (equivalent to *episodes* during training)
+    + <code>-l</code>: Set a number of times to play the game (equivalent to *episodes* during training).
+    + <code>-t</code>: Set a duration in seconds. The agent will play the game in loop for this duration.
     + <code>-h</code>: Display a help message.
 
 ## DQN
@@ -121,6 +125,7 @@ In order to achieve the goal set we used several value based algorithms as well 
     + <code>-s</code>: Activate Slow Mode.
     + <code>-r</code>: Activate Render.
     + <code>-l</code>: Set a number of times to play the game (equivalent to *episodes* during training). **Default**: 1
+    + <code>-t</code>: Set a duration in seconds. The agent will play the game in loop for this duration.
     + <code>-h</code>: Display a help message.
 - ***DQN.ipynb***: A jupyter notebook demonstrating the process to train a new model as well as the different parameters we applied to train different models with different parameters and there impact on training graphs (*epsilon*, *steps* and *reward* per episode).
 - ***models.csv***: Since trained several models to compare how each parameter influenced performances we saved each model's parameters along with its win rate in this *.csv* file.
