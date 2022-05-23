@@ -68,6 +68,7 @@ In order to achieve the goal set we used several value based algorithms as well 
     + <code>-d</code>: Decay Rate. **Default**: 0.01
     + <code>--show_empty</code>: Count the number of empty lines in the resulting Q Matrice. **Default**: True
     + <code>-h</code>: Display a help message.
+- ***Q-Learning_Train_Interface.py***: A python script using streamlit in order to give the user an interface to define different settings for training a new model. In order to use it run <code>streamlit run Q-Learning_Train_Interface.py</code>. This interface allows for the use of custom parameters as well as predefined ones.
 - ***q-table.npy***: The resulting model (or Q-Matrix) stored in a *numpy* file. It took 17 seconds to train it during *25 000* episodes.
 - ***Q-Learning_Play.py***: A python script used to play the Taxi Game based on the previously trained model (***q-table.npy**) to run it use <code>python Q-Learning_Play.py</code> with the following possible arguments:
     + <code>-s</code>: Activate Slow Mode.
