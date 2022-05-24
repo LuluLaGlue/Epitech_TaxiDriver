@@ -69,8 +69,8 @@ In order to achieve the goal set we used several value based algorithms as well 
     + <code>--show_empty</code>: Count the number of empty lines in the resulting Q Matrice. **Default**: True
     + <code>-h</code>: Display a help message.
 - ***Q-Learning_Train_Interface.py***: A python script using streamlit in order to give the user an interface to define different settings for training a new model. In order to use it run <code>streamlit run Q-Learning_Train_Interface.py</code>. This interface allows for the use of custom parameters as well as predefined ones.
-- ***q-table.npy***: The resulting model (or Q-Matrix) stored in a *numpy* file. It took 17 seconds to train it during *25 000* episodes.
-- ***Q-Learning_Play.py***: A python script used to play the Taxi Game based on the previously trained model (***q-table.npy**) to run it use <code>python Q-Learning_Play.py</code> with the following possible arguments:
+- ***qtable.npy***: The resulting model (or Q-Matrix) stored in a *numpy* file. It took 17 seconds to train it during *25 000* episodes.
+- ***Q-Learning_Play.py***: A python script used to play the Taxi Game based on the previously trained model (***qtable.npy**) to run it use <code>python Q-Learning_Play.py</code> with the following possible arguments:
     + <code>-s</code>: Activate Slow Mode.
     + <code>-r</code>: Activate Render.
     + <code>-l</code>: Set a number of times to play the game (equivalent to *episodes* during training).
@@ -89,8 +89,8 @@ In order to achieve the goal set we used several value based algorithms as well 
     + <code>--min_epsilon</code>: Minimal value for exploration rate. **Default**: 0.001
     + <code>-d</code>: Decay Rate. **Default**: 0.01
     + <code>-h</code>: Display a help message.
-- ***q-table.npy***: The resulting model (or Q-Matrix) stored in a *numpy* file. We observed that the *25 000* episodes used with ***Q Learning*** were no longer needed and that the model could be trained with roughly *10 000* episodes, doing so took only *3.2* secondes of training.
-- ***SARSA_Play.py***: A python script used to play the Taxi Game based on the previously trained model (***q-table.npy***) to run it use <code>python SARSA_Play.py</code> with the following possible arguments:
+- ***qtable.npy***: The resulting model (or Q-Matrix) stored in a *numpy* file. We observed that the *25 000* episodes used with ***Q Learning*** were no longer needed and that the model could be trained with roughly *10 000* episodes, doing so took only *3.2* secondes of training.
+- ***SARSA_Play.py***: A python script used to play the Taxi Game based on the previously trained model (***qtable.npy***) to run it use <code>python SARSA_Play.py</code> with the following possible arguments:
     + <code>-s</code>: Activate Slow Mode.
     + <code>-r</code>: Activate Render.
     + <code>-l</code>: Set a number of times to play the game (equivalent to *episodes* during training).
@@ -131,6 +131,11 @@ In order to achieve the goal set we used several value based algorithms as well 
 - ***DQN.ipynb***: A jupyter notebook demonstrating the process to train a new model as well as the different parameters we applied to train different models with different parameters and there impact on training graphs (*epsilon*, *steps* and *reward* per episode).
 - ***models.csv***: Since trained several models to compare how each parameter influenced performances we saved each model's parameters along with its win rate in this *.csv* file.
 - ***dashboard.py***: A python script used to display comparison data between each trained models. Run <code>streamlit run dashboard.py</code> and visit *http://localhost:8501/*
+
+## Dashboard
+&emsp;Each of these algorithms can be tested inside a dashboard present in the *dashboard.py*. To run it place yoursel at the root of the project and run <code>streamlit run dashboard.py</code>. This dashboard is composed of **2** parts, the first one allows for testing pre-trained algorithms and the *Taxi* environnement. Simply select an algorithm and set either a number of episode (*loop*) to play or a time to run (to use the *loop* setting set *time* to *0*).
+
+&emsp;The second part allows to train a new *Q-Learning* based model. Select a training mode (Either *Custom* or *Performance*), enter the wanted parameters (or not if you have chosen *Performance*) and click on *Start training*. A new model will be trained.
 
 # Conclusions
 
