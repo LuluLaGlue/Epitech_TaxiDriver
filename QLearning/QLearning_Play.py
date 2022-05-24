@@ -7,13 +7,13 @@ import gym
 import sys
 
 
-def play(slow: bool = False,
+def play(path: str = "qtable.npy", slow: bool = False,
          render: bool = False,
          is_loop: bool = False,
          is_time: bool = False) -> tuple[int, int]:
     env = gym.make("Taxi-v3")
 
-    q_table = np.load("q-table.npy")
+    q_table = np.load(path)
     done = False
     result = 0
     state = env.reset()
@@ -59,9 +59,9 @@ def display_data(total, total_failed, start, mean_steps, mean_result):
                 np.round(mean_result / total, 2)))
 
 
-def solve(mean_steps, mean_result, total_failed, slow, render, is_loop,
+def solve(path, mean_steps, mean_result, total_failed, slow, render, is_loop,
           is_time):
-    steps, result = play(slow=slow,
+    steps, result = play(path=path,slow=slow,
                          render=render,
                          is_loop=is_loop,
                          is_time=is_time)
@@ -133,7 +133,7 @@ if __name__ == "__main__":
         stop = datetime.datetime.now() + maxrt
         total = 0
         while datetime.datetime.now() < stop:
-            mean_steps, mean_result, total_failed = solve(
+            mean_steps, mean_result, total_failed = solve("qtable.npy",
                 mean_steps, mean_result, total_failed, args.slow, args.render,
                 is_loop, True)
             total += 1
@@ -141,7 +141,7 @@ if __name__ == "__main__":
         display_data(total, total_failed, start, mean_steps, mean_result)
     else:
         for l in range(args.loop):
-            mean_steps, mean_result, total_failed = solve(
+            mean_steps, mean_result, total_failed = solve("qtable.npy",
                 mean_steps, mean_result, total_failed, args.slow, args.render,
                 is_loop, False)
 

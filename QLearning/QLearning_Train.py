@@ -138,7 +138,7 @@ def train(episodes: int = 25000,
         print("Found {} empty lines in the Q Table - {}%.".format(
             total_empty, int((total_empty / len(q_table) * 100))))
 
-    np.save("q-table", q_table)
+    np.save("qtable", q_table)
     plt.show()
     plt.savefig("Q-Learning_graph.png")
 
