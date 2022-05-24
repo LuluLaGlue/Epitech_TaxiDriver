@@ -7,7 +7,8 @@ import gym
 import sys
 
 
-def play(path: str = "qtable.npy", slow: bool = False,
+def play(path: str = "qtable.npy",
+         slow: bool = False,
          render: bool = False,
          is_loop: bool = False,
          is_time: bool = False) -> tuple[int, int]:
@@ -52,16 +53,18 @@ def play(path: str = "qtable.npy", slow: bool = False,
 def display_data(total, total_failed, start, mean_steps, mean_result):
     print()
     print(
-        "[{} LOOP DONE - {}% FAILED - {} SECONDES] - Mean Steps Per Loop: {} - Mean Reward Per Loop: {}"
+        "[{} LOOP DONE - {}% FAILED - {} SECONDES] - Mean Steps Per Loop: {} - Mean Reward Per Loop: {} - Mean Time Per Loop: {}"
         .format(total, np.round(total_failed / total * 100, 2),
                 np.round(time.time() - start, 4),
                 np.round(mean_steps / total, 2),
-                np.round(mean_result / total, 2)))
+                np.round(mean_result / total, 2),
+                np.round((time.time() - start) / total, 6)))
 
 
 def solve(path, mean_steps, mean_result, total_failed, slow, render, is_loop,
           is_time):
-    steps, result = play(path=path,slow=slow,
+    steps, result = play(path=path,
+                         slow=slow,
                          render=render,
                          is_loop=is_loop,
                          is_time=is_time)
@@ -133,17 +136,17 @@ if __name__ == "__main__":
         stop = datetime.datetime.now() + maxrt
         total = 0
         while datetime.datetime.now() < stop:
-            mean_steps, mean_result, total_failed = solve("qtable.npy",
-                mean_steps, mean_result, total_failed, args.slow, args.render,
-                is_loop, True)
+            mean_steps, mean_result, total_failed = solve(
+                "qtable.npy", mean_steps, mean_result, total_failed, args.slow,
+                args.render, is_loop, True)
             total += 1
 
         display_data(total, total_failed, start, mean_steps, mean_result)
     else:
         for l in range(args.loop):
-            mean_steps, mean_result, total_failed = solve("qtable.npy",
-                mean_steps, mean_result, total_failed, args.slow, args.render,
-                is_loop, False)
+            mean_steps, mean_result, total_failed = solve(
+                "qtable.npy", mean_steps, mean_result, total_failed, args.slow,
+                args.render, is_loop, False)
 
         if is_loop:
             display_data(args.loop, total_failed, start, mean_steps,

@@ -65,8 +65,9 @@ def train(episodes=2000,
     reward = 0
 
     print("{} - Starting Training...\n".format(start_date))
+    start_episode = time.time()
+
     for e in range(episodes):
-        start_episode = time.time()
         done = False
 
         total_reward.append(0)
@@ -103,11 +104,11 @@ def train(episodes=2000,
         if e % int(episodes / 100) == 0:
             episode_time = (time.time() - start_episode)
             print(
-                "[EPISODE {}/{}] - {}min - Mean reward for last {} Episodes: {} in {} steps"
-                .format(e, episodes, np.round(episode_time / 60, 2),
-                        int(episodes / 100),
+                "[EPISODE {}/{}] - Mean reward for last {} Episodes: {} in {} steps - Mean Time Per Episode: {}"
+                .format(e, episodes, int(episodes / 100),
                         np.mean(total_reward[-int(episodes / 100):]),
-                        np.mean(steps_per_episode[-int(episodes / 100):])))
+                        np.mean(steps_per_episode[-int(episodes / 100):]),
+                        np.round(episode_time / e, 6) if e != 0 else 0))
 
     end_date = datetime.now()
     execution_time = (time.time() - start_time)

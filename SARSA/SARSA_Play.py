@@ -53,11 +53,12 @@ def play(path: str = "qtable.npy",
 def display_data(total, total_failed, start, mean_steps, mean_result):
     print()
     print(
-        "[{} LOOP DONE - {}% FAILED - {} SECONDES] - Mean Steps Per Loop: {} - Mean Reward Per Loop: {}"
+        "[{} LOOP DONE - {}% FAILED - {} SECONDES] - Mean Steps Per Loop: {} - Mean Reward Per Loop: {} - Mean Time Per Loop : {}"
         .format(total, np.round(total_failed / total * 100, 2),
                 np.round(time.time() - start, 4),
                 np.round(mean_steps / total, 2),
-                np.round(mean_result / total, 2)))
+                np.round(mean_result / total, 2),
+                np.round((time.time() - start) / total), 6))
 
 
 def solve(path, slow, render, mean_steps, mean_result, total_failed, is_loop,

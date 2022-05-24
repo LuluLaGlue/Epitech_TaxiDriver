@@ -102,11 +102,9 @@ def monte_carlo_e_soft(env,
         if e % int(episodes / 10) == 0:
             episode_time = (time.time() - start_episode)
             start_episode = time.time()
-            print("[EPISODE {}/{}] - {} secondes.".format(
-                e,
-                episodes,
-                np.round(episode_time, 4),
-            ))
+            print("[EPISODE {}/{}] - {} secondes - Mean Time Per Episode: {}s".
+                  format(e, episodes, np.round(episode_time, 4),
+                         np.round(episode_time / e, 6) if e != 0 else 0))
 
     with open('policy.pkl', 'wb') as f:
         pickle.dump(policy, f)

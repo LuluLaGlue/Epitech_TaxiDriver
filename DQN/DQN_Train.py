@@ -287,21 +287,19 @@ class TrainingAgent():
 
             if i_episode % (self.config["SAVE_FREQ"] / 2) == 0:
                 print(
-                    "[EPISODE {}/{}] - {}min - Mean reward for last {} Episodes: {} in {} steps"
+                    "[EPISODE {}/{}] - {}min - Mean reward for last {} Episodes: {} in {} steps - Mean Time Per Episode: {}"
                     .format(
                         i_episode + episode_done, self.config["NUM_EPISODES"],
                         int((time.time() - start) / 60),
-                        self.config["SAVE_FREQ"],
+                        int(self.config["SAVE_FREQ"] / 2),
                         np.round(
-                            np.mean(
-                                self.
-                                reward_in_episode[-self.config["SAVE_FREQ"]:]),
-                            2),
+                            np.mean(self.reward_in_episode[
+                                -int(self.config["SAVE_FREQ"] / 2):]), 2),
                         np.round(
-                            np.mean(
-                                self.
-                                episode_durations[-self.config["SAVE_FREQ"]:]),
-                            2)))
+                            np.mean(self.episode_durations[
+                                -int(self.config["SAVE_FREQ"] / 2):]), 2),
+                        np.round((time.time() - start) /
+                                 i_episode, 6) if i_episode != 0 else 0))
                 start = time.time()
 
             if i_episode % self.config["SAVE_FREQ"] == 0:

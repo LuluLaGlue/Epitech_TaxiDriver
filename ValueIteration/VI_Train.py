@@ -68,6 +68,8 @@ def train(env=gym.make("Taxi-v3"),
     print("Time to train: \n    - {}s\n    - {}min\n    - {}h".format(
         np.round(execution_time, 2), np.round(execution_time / 60, 2),
         np.round(execution_time / 3600, 2)))
+    print("Mean Time Per Episode: {}".format(
+        np.round(execution_time / len(total_reward), 6)))
     np.save("v-iteration", Pi)
 
     return np.round(execution_time, 2), np.mean(total_reward)

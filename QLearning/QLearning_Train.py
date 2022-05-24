@@ -75,8 +75,8 @@ def train(episodes: int = 25000,
     epsilon_vec = []
 
     print("{} - Starting Training...\n".format(start_date))
+    start_episode = time.time()
     for e in range(episodes):
-        start_episode = time.time()
         state = env.reset()
 
         done = False
@@ -85,6 +85,8 @@ def train(episodes: int = 25000,
         epsilon = min_epsilon + (max_epsilon - min_epsilon) * np.exp(
             -epsilon_decay * e)
         epsilon_vec.append(epsilon)
+        # Display random episodes
+        display_episode = random.uniform(0, 1) < 0.001
 
         # Loop as long as the game is not over, i.e. done is not True
         while not done:
@@ -106,15 +108,17 @@ def train(episodes: int = 25000,
             q_table[state, action] = (1 - lr) * current_value + lr * (
                 reward + gamma * next_max)
             state = next_state
+            if display_episode:
+                env.render()
 
         if e % int(episodes / 100) == 0:
             episode_time = (time.time() - start_episode)
             print(
-                "[EPISODE {}/{}] - {}min - Mean reward for last {} Episodes: {} in {} steps"
-                .format(e, episodes, np.round(episode_time / 60, 2),
-                        int(episodes / 100),
+                "[EPISODE {}/{}] - Mean reward for last {} Episodes: {} in {} steps - Mean Time Per Episode: {}"
+                .format(e, episodes, int(episodes / 100),
                         np.mean(total_reward[-int(episodes / 100):]),
-                        np.mean(steps_per_episode[-int(episodes / 100):])))
+                        np.mean(steps_per_episode[-int(episodes / 100):]),
+                        np.round(episode_time / e, 6) if e != 0 else 0))
 
     plot_durations(steps_per_episode,
                    total_reward,

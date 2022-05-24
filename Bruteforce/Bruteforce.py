@@ -206,10 +206,11 @@ def play(env=gym.make("Taxi-v3"), is_loop: bool = False,
 def display_data(total, start, mean_steps, mean_result):
     print()
     print(
-        "[{} LOOP DONE -  {} SECONDES] - Mean Steps Per Loop: {} - Max Steps For a Loop: {} - Mean Reward Per Loop: {}"
+        "[{} LOOP DONE -  {} SECONDES] - Mean Steps Per Loop: {} - Max Steps For a Loop: {} - Mean Reward Per Loop: {} - Mean Time Per Loop: {}s"
         .format(total, np.round(time.time() - start, 4),
                 np.round(mean_steps / total, 2), np.max(max_steps),
-                np.round(mean_result / total, 2)))
+                np.round(mean_result / total, 2),
+                np.round((time.time() - start) / total), 6))
 
 
 def error_args(args):
