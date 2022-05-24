@@ -72,10 +72,11 @@ def display_data(total, total_failed, start, mean_steps, mean_result):
                 np.round(mean_result / total, 2)))
 
 
-def solve(policy, mean_steps, mean_result, total_failed, is_time, is_loop):
+def solve(policy, mean_steps, mean_result, total_failed, slow, render, is_time,
+          is_loop):
     steps, result = play(policy,
-                         slow=args.slow,
-                         render=args.render,
+                         slow=slow,
+                         render=render,
                          is_loop=is_loop,
                          is_time=is_time)
     mean_steps += steps
@@ -154,6 +155,8 @@ if __name__ == "__main__":
                                                           mean_steps,
                                                           mean_result,
                                                           total_failed,
+                                                          slow=args.slow,
+                                                          render=args.render,
                                                           is_time=True,
                                                           is_loop=is_loop)
             total += 1
@@ -164,6 +167,8 @@ if __name__ == "__main__":
                                                           mean_steps,
                                                           mean_result,
                                                           total_failed,
+                                                          slow=args.slow,
+                                                          render=args.render,
                                                           is_time=False,
                                                           is_loop=is_loop)
 
