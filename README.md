@@ -132,10 +132,8 @@ In order to achieve the goal set we used several value based algorithms as well 
 - ***models.csv***: Since trained several models to compare how each parameter influenced performances we saved each model's parameters along with its win rate in this *.csv* file.
 - ***dashboard.py***: A python script used to display comparison data between each trained models. Run <code>streamlit run dashboard.py</code> and visit *http://localhost:8501/*
 
-## Dashboard
-&emsp;Each of these algorithms can be tested inside a dashboard present in the *dashboard.py*. To run it place yoursel at the root of the project and run <code>streamlit run dashboard.py</code>. This dashboard is composed of **2** parts, the first one allows for testing pre-trained algorithms and the *Taxi* environnement. Simply select an algorithm and set either a number of episode (*loop*) to play or a time to run (to use the *loop* setting set *time* to *0*).
-
-&emsp;The second part allows to train a new *Q-Learning* based model. Select a training mode (Either *Custom* or *Performance*), enter the wanted parameters (or not if you have chosen *Performance*) and click on *Start training*. A new model will be trained.
+## HMI
+&emsp;A simpler way to train a new model is to use the *hmi.py* script that will walk you through the process of defining hyperparameters via an user interface using *PyQT5*. To use it run <code>python hmi.py</code>
 
 # Conclusions
 
