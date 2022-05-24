@@ -8,7 +8,7 @@ from QLearning.QLearning_Train import train as train_QL
 from MonteCarlo.MC_Train import monte_carlo_e_soft as train_MC
 
 
-class App(QWidget):
+class HCI(QWidget):
 
     def __init__(self):
         super().__init__()
@@ -133,4 +133,4 @@ class App(QWidget):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    ex = App()
+    ex = HCI()

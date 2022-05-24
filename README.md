@@ -132,8 +132,8 @@ In order to achieve the goal set we used several value based algorithms as well 
 - ***models.csv***: Since trained several models to compare how each parameter influenced performances we saved each model's parameters along with its win rate in this *.csv* file.
 - ***dashboard.py***: A python script used to display comparison data between each trained models. Run <code>streamlit run dashboard.py</code> and visit *http://localhost:8501/*
 
-## HMI
-&emsp;A simpler way to train a new model is to use the *hmi.py* script that will walk you through the process of defining hyperparameters via an user interface using *PyQT5*. To use it run <code>python hmi.py</code>
+## HCI
+&emsp;A simpler way to train a new model is to use the *hci.py* script that will walk you through the process of defining hyperparameters via an user interface using *PyQT5*. This small interface will also give you the possibility to use a *Performance* mode with pre-selected parameters to their optimal values. To use it run <code>python hci.py</code>.
 
 # Conclusions
 
