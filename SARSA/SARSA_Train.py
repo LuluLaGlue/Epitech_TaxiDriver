@@ -123,7 +123,7 @@ def train(episodes=2000,
         np.round(execution_time, 2), np.round(execution_time / 60, 2),
         np.round(execution_time / 3600, 2)))
 
-    np.save("q-table", Q)
+    np.save("qtable", Q)
     plt.savefig("SARSA_graph.png")
 
     return np.round(execution_time, 2), np.mean(total_reward)
