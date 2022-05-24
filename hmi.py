@@ -12,26 +12,37 @@ class App(QWidget):
 
     def __init__(self):
         super().__init__()
-        self.title = 'PyQt5 input dialogs - pythonspot.com'
-        self.left = 100
-        self.top = 100
-        self.width = 640
-        self.height = 480
         self.args = {}
-        algo = self.__getAlgo__()
-        self.__initUI__()
+        mode = self.__getMode()
+        algo = self.__getAlgo()
         self.setParam(algo)
+        if mode == "Custom":
+            self.askParam()
+        print("Using {} mode with {} algorithm.".format(mode, algo))
+        print("Selected Parameters: ", self.args)
         self.train(algo)
 
-    def __getAlgo__(self):
-        return self.__getChoice__(
+    def __getMode(self) -> str:
+        '''
+        Display a dropdown selector with 2 modes (custom and performance)
+        
+        Returns the selected mode
+        '''
+        return self.__getChoice(("Custom", "Performance"))
+
+    def __getAlgo(self) -> str:
+        '''
+        Display a dropdown selector with a list of available algorithms
+        
+        Returns the name of the selected algorithm
+        '''
+        return self.__getChoice(
             ("Value Iteration", "Monte Carlo", "Q-Learning", "SARSA"))
 
-    def __initUI__(self):
-        self.setWindowTitle(self.title)
-        self.setGeometry(self.left, self.top, self.width, self.height)
-
-    def setParam(self, algo):
+    def setParam(self, algo: str):
+        '''
+        Based on the given algorithm name, creates a list of paramaters and display an input field for each  param.
+        '''
         if algo == "Q-Learning" or algo == "SARSA":
             self.args = {
                 "lr": 0.01 if algo == "Q-Learning" else 0.85,
@@ -46,22 +57,26 @@ class App(QWidget):
         elif algo == "Value Iteration":
             self.args = {"gamma": 0.9, "significant_improvement": 0.001}
 
+    def askParam(self):
         for key in self.args:
             if key == "episodes":
-                self.__getInteger__("Number of Episodes",
-                                    key,
-                                    default=self.args[key],
-                                    min=1,
-                                    max=1000000)
+                self.__getInteger("Number of Episodes",
+                                  key,
+                                  default=self.args[key],
+                                  min=1,
+                                  max=1000000)
             else:
-                self.__getDouble__(key,
-                                   key,
-                                   default=self.args[key],
-                                   min=0,
-                                   max=1,
-                                   decimals=4)
+                self.__getDouble(key,
+                                 key,
+                                 default=self.args[key],
+                                 min=0,
+                                 max=1,
+                                 decimals=4)
 
-    def train(self, algo):
+    def train(self, algo: str):
+        '''
+        Based on the selected algorithm, trains it with the previously selected parameters.
+        '''
         plt.ion()
         if algo == "Value Iteration":
             train_VI(
@@ -95,19 +110,21 @@ class App(QWidget):
                     path_graph="SARSA/SARSA_graph.png")
         plt.ioff()
 
-    def __getChoice__(self, items):
+    def __getChoice(self, items: tuple[str]) -> str:
         item, okPressed = QInputDialog.getItem(self, "Get item", "Algorithm:",
                                                items, 0, False)
         if okPressed and item:
             return item
 
-    def __getDouble__(self, placeholder, target, default, min, max, decimals):
-        d, okPressed = QInputDialog.getDouble(self, placeholder, "Value:",
+    def __getDouble(self, placeholder: str, target: str, default: float,
+                    min: float, max: float, decimals: int):
+        d, okPressed = QInputDialog.getDouble(self, placeholder, placeholder,
                                               default, min, max, decimals)
         if okPressed:
             self.args[target] = d
 
-    def __getInteger__(self, placeholder, target, default, min, max):
+    def __getInteger(self, placeholder: str, target: str, default: int,
+                     min: int, max: int):
         d, okPressed = QInputDialog.getInt(self, placeholder, "Value:",
                                            default, min, max, 100)
         if okPressed:
