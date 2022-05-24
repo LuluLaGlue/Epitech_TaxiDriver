@@ -52,9 +52,10 @@ def run_game(env, policy: dict) -> list[list[int]]:
     return episode
 
 
-def monte_carlo_e_soft(env,
+def monte_carlo_e_soft(env=gym.make("Taxi-v3"),
                        episodes: int = 100,
-                       epsilon: float = 0.01) -> dict:
+                       epsilon: float = 0.01,
+                       path: str = "policy.pkl") -> dict:
     policy = create_random_policy(env)
     Q = create_state_action_dictionary(env, policy)
     returns = {}
@@ -106,7 +107,7 @@ def monte_carlo_e_soft(env,
                   format(e, episodes, np.round(episode_time, 4),
                          np.round(episode_time / e, 6) if e != 0 else 0))
 
-    with open('policy.pkl', 'wb') as f:
+    with open(path, 'wb') as f:
         pickle.dump(policy, f)
 
     return policy

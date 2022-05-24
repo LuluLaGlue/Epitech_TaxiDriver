@@ -1,12 +1,18 @@
 import matplotlib.pyplot as plt
 from datetime import datetime
 import numpy as np
+import matplotlib
 import argparse
 import time
 import gym
 
+is_notebook = 'inline' in matplotlib.get_backend()
 
-def moving_average(x, periods=5):
+if is_notebook:
+    from IPython import display
+
+
+def moving_average(x: list, periods: int = 5) -> list:
     if len(x) < periods:
 
         return x
@@ -17,10 +23,10 @@ def moving_average(x, periods=5):
     return np.hstack([x[:periods - 1], res])
 
 
-def plot_durations(episode_durations,
-                   reward_in_episode,
-                   epsilon_vec,
-                   max_steps_per_episode=100):
+def plot_durations(episode_durations: list,
+                   reward_in_episode: list,
+                   epsilon_vec: list,
+                   max_steps_per_episode: int = 100) -> None:
     '''Plot graphs containing Epsilon, Rewards, and Steps per episode over time'''
     lines = []
     fig = plt.figure(1, figsize=(15, 7))
@@ -44,16 +50,25 @@ def plot_durations(episode_durations,
     labs = [l.get_label() for l in lines]
     ax1.legend(lines, labs, loc=3)
 
+    if is_notebook:
+        display.clear_output(wait=True)
+    else:
+        plt.show()
     plt.pause(0.001)
 
+    return
 
-def train(episodes=2000,
+
+def train(env=gym.make("Taxi-v3"),
+          episodes=2000,
           gamma=0.95,
           epsilon=1,
           max_epsilon=1,
           min_epsilon=0.001,
           epsilon_decay=0.01,
-          alpha=0.85):
+          alpha=0.85,
+          path_table: str = "qtable",
+          path_graph: str = "SARSA_graph.png"):
     start_date = datetime.now()
     start_time = time.time()
     total_reward = []
@@ -123,9 +138,10 @@ def train(episodes=2000,
     print("Time to train: \n    - {}s\n    - {}min\n    - {}h".format(
         np.round(execution_time, 2), np.round(execution_time / 60, 2),
         np.round(execution_time / 3600, 2)))
-
-    np.save("qtable", Q)
-    plt.savefig("SARSA_graph.png")
+    print("Mean Time Per Episode: {}".format(
+        np.round(execution_time / len(total_reward), 6)))
+    np.save(path_table, Q)
+    plt.savefig(path_graph)
 
     return np.round(execution_time, 2), np.mean(total_reward)
 
@@ -176,5 +192,5 @@ if __name__ == "__main__":
 
     env = gym.make("Taxi-v3")
 
-    train(episodes, gamma, epsilon, max_epsilon, min_epsilon, epsilon_decay,
-          alpha)
+    train(env, episodes, gamma, epsilon, max_epsilon, min_epsilon,
+          epsilon_decay, alpha)

@@ -60,16 +60,21 @@ def plot_durations(episode_durations: list,
     return
 
 
-def train(episodes: int = 25000,
+def train(env=gym.make("Taxi-v3"),
+          episodes: int = 25000,
           lr: float = 0.01,
           gamma: float = 0.99,
           epsilon: float = 1,
           max_epsilon: float = 1,
           min_epsilon: float = 0.001,
           epsilon_decay: float = 0.01,
-          show_empty: bool = True) -> tuple[float, int]:
+          show_empty: bool = True,
+          path_table: str = "qtable",
+          path_graph: str = "QLearning_graph.png") -> tuple[float, int]:
     q_table = np.zeros([env.observation_space.n, env.action_space.n])
 
+    start_date = datetime.now()
+    start_time = time.time()
     total_reward = []
     steps_per_episode = []
     epsilon_vec = []
@@ -133,6 +138,8 @@ def train(episodes: int = 25000,
     print("Time to train: \n    - {}s\n    - {}min\n    - {}h".format(
         np.round(execution_time, 2), np.round(execution_time / 60, 2),
         np.round(execution_time / 3600, 2)))
+    print("Mean Time Per Episode: {}".format(
+        np.round(execution_time / len(total_reward), 6)))
 
     if show_empty:
         total_empty = 0
@@ -142,9 +149,9 @@ def train(episodes: int = 25000,
         print("Found {} empty lines in the Q Table - {}%.".format(
             total_empty, int((total_empty / len(q_table) * 100))))
 
-    np.save("qtable", q_table)
+    np.save(path_table, q_table)
     plt.show()
-    plt.savefig("Q-Learning_graph.png")
+    plt.savefig(path_graph)
 
     return np.round(execution_time, 2), np.mean(total_reward)
 
@@ -201,11 +208,8 @@ if __name__ == "__main__":
     epsilon_decay = args.decay_rate
     show_empty = args.empty
 
-    start_date = datetime.now()
-    start_time = time.time()
-
     env = gym.make("Taxi-v3")
 
-    time, reward = train(episodes, lr, gamma, epsilon, max_epsilon,
+    time, reward = train(env, episodes, lr, gamma, epsilon, max_epsilon,
                          min_epsilon, epsilon_decay, show_empty)
     plt.ioff()

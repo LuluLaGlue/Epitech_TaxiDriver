@@ -5,7 +5,7 @@ import time
 import gym
 
 
-def choose_action(state: int, n_actions: int, V: dict) -> int:
+def choose_action(env, gamma, state: int, n_actions: int, V: dict) -> int:
     best_action = None
     best_value = float('-inf')
 
@@ -24,7 +24,10 @@ def choose_action(state: int, n_actions: int, V: dict) -> int:
 
 def train(env=gym.make("Taxi-v3"),
           gamma: float = 0.9,
-          significant_improvement: float = 0.001) -> tuple[float, int]:
+          significant_improvement: float = 0.001,
+          path: str = "v-iteration") -> tuple[float, int]:
+    start_date = datetime.now()
+    start_time = time.time()
     env.reset()
     n_actions = env.action_space.n
     n_observations = env.observation_space.n
@@ -42,7 +45,7 @@ def train(env=gym.make("Taxi-v3"),
         biggest_change = 0
         for state in range(0, n_observations):
             old_v = V[state]
-            action = choose_action(state, n_actions, V)
+            action = choose_action(env, gamma, state, n_actions, V)
             env.env.s = state
 
             new_state, reward, done, info = env.step(action)
@@ -70,7 +73,7 @@ def train(env=gym.make("Taxi-v3"),
         np.round(execution_time / 3600, 2)))
     print("Mean Time Per Episode: {}".format(
         np.round(execution_time / len(total_reward), 6)))
-    np.save("v-iteration", Pi)
+    np.save(path, Pi)
 
     return np.round(execution_time, 2), np.mean(total_reward)
 
@@ -87,8 +90,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     gamma = args.gamma
-    start_date = datetime.now()
-    start_time = time.time()
 
     env = gym.make("Taxi-v3")
 
