@@ -7,14 +7,15 @@ import gym
 import sys
 
 
-def play(slow: bool = False,
+def play(path: str = "v-iteration.npy",
+         slow: bool = False,
          render: bool = False,
          is_loop: bool = False,
          is_time: bool = False) -> tuple[int, int]:
     env = gym.make("Taxi-v3")
     state = env.reset()
 
-    Pi = np.load("v-iteration.npy")
+    Pi = np.load(path)
     done = False
     result = 0
     steps = 1
@@ -56,9 +57,10 @@ def display_data(total, total_failed, start, mean_steps, mean_result):
                 np.round(mean_result / total, 2)))
 
 
-def solve(slow, render, mean_steps, mean_result, total_failed, is_loop,
+def solve(path, slow, render, mean_steps, mean_result, total_failed, is_loop,
           is_time):
-    steps, result = play(slow=slow,
+    steps, result = play(path=path,
+                         slow=slow,
                          render=render,
                          is_loop=is_loop,
                          is_time=is_time)
@@ -132,16 +134,16 @@ if __name__ == "__main__":
 
         while datetime.datetime.now() < stop:
             mean_steps, mean_result, total_failed = solve(
-                args.slow, args.render, mean_steps, mean_result, total_failed,
-                is_loop, True)
+                "v-iteration.npy", args.slow, args.render, mean_steps,
+                mean_result, total_failed, is_loop, True)
             total += 1
 
         display_data(total, total_failed, start, mean_steps, mean_result)
     else:
         for l in range(args.loop):
             mean_steps, mean_result, total_failed = solve(
-                args.slow, args.render, mean_steps, mean_result, total_failed,
-                is_loop, False)
+                "v-iteration.npy", args.slow, args.render, mean_steps,
+                mean_result, total_failed, is_loop, False)
 
         if is_loop:
             display_data(args.loop, total_failed, start, mean_steps,
