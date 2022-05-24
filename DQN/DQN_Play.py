@@ -6,7 +6,10 @@ import random
 import argparse
 import datetime
 import numpy as np
-from DQN import DQN, DQN_2
+try:
+    from DQN import DQN, DQN_2
+except:
+    pass
 from IPython import display
 import torch.optim as optim
 
@@ -82,7 +85,8 @@ def solve(model,
     return iteration, total_reward, done
 
 
-def play(mean_steps, mean_result, total_failed, is_time, is_loop):
+def play(env, model, max, mean_steps, mean_result, total_failed, render, slow,
+         is_time, is_loop, device):
     steps, result, done = solve(model,
                                 render=render,
                                 slow=slow,
@@ -201,21 +205,33 @@ if __name__ == "__main__":
         stop = datetime.datetime.now() + maxrt
         total = 0
         while datetime.datetime.now() < stop:
-            steps, result, mean_steps, mean_result = play(mean_steps,
+            steps, result, mean_steps, mean_result = play(env,
+                                                          model,
+                                                          max,
+                                                          mean_steps,
                                                           mean_result,
                                                           total_failed,
+                                                          render=render,
+                                                          slow=slow,
                                                           is_time=True,
-                                                          is_loop=is_loop)
+                                                          is_loop=is_loop,
+                                                          device=device)
             total += 1
         display_data(total, total_failed, start, mean_steps, mean_result)
     else:
 
         for l in range(loop):
-            steps, result, mean_steps, mean_result = play(mean_steps,
+            steps, result, mean_steps, mean_result = play(env,
+                                                          model,
+                                                          max,
+                                                          mean_steps,
                                                           mean_result,
                                                           total_failed,
+                                                          render=render,
+                                                          slow=slow,
                                                           is_time=False,
-                                                          is_loop=is_loop)
+                                                          is_loop=is_loop,
+                                                          device=device)
 
         if is_loop:
             display_data(loop, total_failed, start, mean_steps, mean_result)
