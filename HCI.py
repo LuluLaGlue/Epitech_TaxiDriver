@@ -28,7 +28,8 @@ class HCI(QWidget):
         
         Returns the selected mode
         '''
-        return self.__getChoice(("Custom", "Performance"))
+        return self.__getChoice("Mode", "Training Mode:",
+                                ("Custom", "Performance"))
 
     def __getAlgo(self) -> str:
         '''
@@ -37,6 +38,7 @@ class HCI(QWidget):
         Returns the name of the selected algorithm
         '''
         return self.__getChoice(
+            "Get item", "Algorithm:",
             ("Value Iteration", "Monte Carlo", "Q-Learning", "SARSA"))
 
     def setParam(self, algo: str):
@@ -110,9 +112,9 @@ class HCI(QWidget):
                     path_graph="SARSA/SARSA_graph.png")
         plt.ioff()
 
-    def __getChoice(self, items: tuple[str]) -> str:
-        item, okPressed = QInputDialog.getItem(self, "Get item", "Algorithm:",
-                                               items, 0, False)
+    def __getChoice(self, title, name, items: tuple[str]) -> str:
+        item, okPressed = QInputDialog.getItem(self, title, name, items, 0,
+                                               False)
         if okPressed and item:
             return item
 
